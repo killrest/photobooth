@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Webcam from 'react-webcam';
+import Image from 'next/image';
 import { FaCamera, FaUpload, FaArrowLeft, FaRedo } from 'react-icons/fa';
 import { usePhotoContext } from '../context/PhotoContext';
 import Link from 'next/link';
@@ -309,11 +310,14 @@ const PhotoPage = () => {
                             >
                               {capturedPhotos[i] ? (
                                 <>
-                                  <img 
+                                  <Image 
                                     src={capturedPhotos[i] as string} 
                                     alt={`Photo ${i+1}`} 
                                     className="w-full h-full object-cover" 
                                     style={{ filter: getCurrentFilterStyle() }}
+                                    width={300}
+                                    height={225}
+                                    unoptimized
                                   />
                                   {captureState === CaptureState.REVIEWING && (
                                     <div className="absolute inset-0 bg-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -356,10 +360,13 @@ const PhotoPage = () => {
                   >
                     {uploadedPhotos[i] ? (
                       <>
-                        <img 
+                        <Image 
                           src={uploadedPhotos[i]} 
                           alt={`Photo ${i+1}`} 
-                          className="w-full h-full object-cover" 
+                          className="w-full h-full object-cover"
+                          width={300}
+                          height={300}
+                          unoptimized
                         />
                         <button
                           onClick={() => removeUploadedPhoto(i)}

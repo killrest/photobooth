@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { FaArrowLeft, FaDownload, FaRedoAlt } from 'react-icons/fa';
 import { usePhotoContext } from '../context/PhotoContext';
 import { toPng } from 'html-to-image';
@@ -52,10 +53,12 @@ const stickers = [
 
 const ResultPage = () => {
   const router = useRouter();
-  const { photoData, setPhotos } = usePhotoContext();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { photoData } = usePhotoContext();
   const [selectedColor, setSelectedColor] = useState('lightBlue');
   const [selectedStickers, setSelectedStickers] = useState<{id: string, x: number, y: number}[]>([]);
   const photoGridRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [draggedSticker, setDraggedSticker] = useState<{id: string, x: number, y: number} | null>(null);
 
   // Check if photos exist, redirect to photo page if not
@@ -144,11 +147,14 @@ const ResultPage = () => {
                 <div className="grid grid-cols-1 gap-1">
                   {photoData && photoData.photos && photoData.photos.map((photo: string, index: number) => (
                     <div key={index} className="relative">
-                      <img 
+                      <Image 
                         src={photo} 
                         alt={`Photo ${index+1}`} 
                         className="w-full rounded-sm"
                         style={{ aspectRatio: '4/3', objectFit: 'cover' }}
+                        width={500}
+                        height={375}
+                        unoptimized
                       />
                     </div>
                   ))}
