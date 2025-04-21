@@ -162,21 +162,21 @@ const PhotoPage = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center mb-6">
-          <Link href="/" className="flex items-center text-gray-700 hover:text-pink-600 transition">
-            <FaArrowLeft className="mr-2" />
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center mb-3">
+          <Link href="/" className="flex items-center text-gray-700 hover:text-pink-600 transition text-sm">
+            <FaArrowLeft className="mr-1" />
             Back to Home
           </Link>
         </div>
 
-        <div className="bg-white rounded-lg shadow-xl p-6 max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-6">Free Online Photobooth - Create Your Photo Strip</h2>
+        <div className="bg-white rounded-lg shadow-xl p-4 max-w-4xl mx-auto">
+          <h2 className="text-xl font-bold text-center mb-3">Free Online Photobooth</h2>
           
           {/* Tab switching */}
-          <div className="flex border-b mb-8">
+          <div className="flex border-b mb-4">
             <button
-              className={`flex-1 py-3 font-medium ${activeTab === 'capture' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-500'}`}
+              className={`flex-1 py-2 font-medium text-sm ${activeTab === 'capture' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-500'}`}
               onClick={() => {
                 setActiveTab('capture');
                 setCaptureState(CaptureState.SELECTING_FILTER);
@@ -184,14 +184,14 @@ const PhotoPage = () => {
                 setCurrentPhotoIndex(0);
               }}
             >
-              <FaCamera className="inline mr-2" />
+              <FaCamera className="inline mr-1" />
               Use Camera
             </button>
             <button
-              className={`flex-1 py-3 font-medium ${activeTab === 'upload' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-500'}`}
+              className={`flex-1 py-2 font-medium text-sm ${activeTab === 'upload' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-500'}`}
               onClick={() => setActiveTab('upload')}
             >
-              <FaUpload className="inline mr-2" />
+              <FaUpload className="inline mr-1" />
               Upload Photos
             </button>
           </div>
@@ -200,21 +200,21 @@ const PhotoPage = () => {
           {activeTab === 'capture' && (
             <div className="flex flex-col items-center">
               {cameraError ? (
-                <div className="text-center p-8 bg-red-50 rounded-lg">
-                  <p className="text-red-600 mb-4">Unable to access camera. Please ensure you have granted camera permissions, or use the photo upload feature.</p>
+                <div className="text-center p-4 bg-red-50 rounded-lg">
+                  <p className="text-red-600 mb-3 text-sm">Unable to access camera. Please ensure you have granted camera permissions, or use the photo upload feature.</p>
                   <button
                     onClick={() => setActiveTab('upload')}
-                    className="px-4 py-2 bg-pink-600 text-white rounded-md"
+                    className="px-3 py-1.5 bg-pink-600 text-white rounded-md text-sm"
                   >
                     Switch to Upload Mode
                   </button>
                 </div>
               ) : (
-                <div className="w-full flex flex-col md:flex-row gap-8">
+                <div className="w-full flex flex-col md:flex-row gap-4">
                   {/* Left: Camera area - always keep open */}
                   <div className="md:w-3/5 flex flex-col md:ml-auto md:mr-0 md:w-2/3">
                     {/* Camera and countdown */}
-                    <div className="relative overflow-hidden rounded-xl shadow-lg border border-gray-200" style={{ aspectRatio: '1/1' }}>
+                    <div className="relative overflow-hidden rounded-xl shadow-md border border-gray-200" style={{ aspectRatio: '1/1', maxHeight: '350px' }}>
                       <Webcam
                         audio={false}
                         ref={webcamRef}
@@ -231,7 +231,7 @@ const PhotoPage = () => {
                       {/* Countdown overlay with better styling */}
                       {captureState === CaptureState.CAPTURING && countdown !== null && countdown >= 0 && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
-                          <div className="text-9xl font-bold text-white drop-shadow-lg animate-pulse" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
+                          <div className="text-7xl font-bold text-white drop-shadow-lg animate-pulse" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
                             {countdown > 0 ? countdown : 'GO!'}
                           </div>
                         </div>
@@ -240,16 +240,16 @@ const PhotoPage = () => {
                     
                     {/* Filter selection with better spacing and style */}
                     {captureState === CaptureState.SELECTING_FILTER && (
-                      <div className="mt-6">
-                        <h3 className="text-lg font-semibold mb-4 text-center">Select Photobooth Filter</h3>
-                        <div className="flex flex-wrap justify-center gap-3 mb-6">
+                      <div className="mt-3">
+                        <h3 className="text-base font-semibold mb-2 text-center">Select Filter</h3>
+                        <div className="flex flex-wrap justify-center gap-2 mb-3">
                           {filterOptions.map((filter) => (
                             <button
                               key={filter.id}
                               onClick={() => handleFilterSelect(filter.id)}
-                              className={`px-5 py-2.5 rounded-full font-medium transition-all duration-200 ${
+                              className={`px-3 py-1.5 rounded-full font-medium text-sm transition-all duration-200 ${
                                 selectedFilter === filter.id 
-                                  ? 'bg-pink-500 text-white shadow-md transform scale-105' 
+                                  ? 'bg-pink-500 text-white shadow-sm transform scale-105' 
                                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300 hover:shadow'
                               }`}
                             >
@@ -260,58 +260,59 @@ const PhotoPage = () => {
                         
                         <button
                           onClick={startCapture}
-                          className="w-full px-6 py-4 bg-pink-500 text-white rounded-md flex items-center justify-center hover:bg-pink-600 transition mt-4 shadow-md font-medium text-lg"
+                          className="w-full px-4 py-2.5 bg-pink-500 text-white rounded-md flex items-center justify-center hover:bg-pink-600 transition mt-3 shadow-md font-medium"
                         >
                           <FaCamera className="mr-2" />
-                          Start Photobooth Capture
+                          Start Capture
                         </button>
                       </div>
                     )}
                     
                     {/* Status indicators and buttons */}
                     {captureState === CaptureState.CAPTURING && (
-                      <div className="text-center mt-4">
-                        <p className="text-gray-600 font-medium">Taking photobooth image {currentPhotoIndex + 1}/4...</p>
+                      <div className="text-center mt-2">
+                        <p className="text-gray-600 font-medium text-sm">Taking photo {currentPhotoIndex + 1}/4...</p>
                       </div>
                     )}
                     
                     {captureState === CaptureState.REVIEWING && (
-                      <div className="flex justify-between gap-4 mt-6">
+                      <div className="flex justify-between gap-3 mt-3">
                         <button
                           onClick={() => {
                             setCapturedPhotos([null, null, null, null]);
                             setCurrentPhotoIndex(0);
                             setCaptureState(CaptureState.SELECTING_FILTER);
                           }}
-                          className="flex-1 px-6 py-3.5 bg-gray-100 text-gray-700 rounded-md flex items-center justify-center hover:bg-gray-200 transition border border-gray-300 shadow font-medium"
+                          className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-md flex items-center justify-center hover:bg-gray-200 transition border border-gray-300 shadow font-medium text-sm"
                         >
-                          <FaRedo className="mr-2" />
-                          Retake Photobooth
+                          <FaRedo className="mr-1" />
+                          Retake All
                         </button>
                         
                         <button
                           onClick={proceedToResults}
                           disabled={capturedPhotos.includes(null)}
-                          className="flex-1 px-6 py-3.5 bg-pink-500 text-white rounded-md flex items-center justify-center hover:bg-pink-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium"
+                          className="flex-1 px-3 py-2 bg-pink-500 text-white rounded-md flex items-center justify-center hover:bg-pink-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium text-sm"
                         >
-                          Next Photobooth Step
+                          Next Step
                         </button>
                       </div>
                     )}
                   </div>
                   
                   {/* Right: Photo preview area with improved layout */}
-                  <div className="md:w-1/3 flex flex-col justify-center mt-6 md:mt-0">
-                    <div className="w-full max-w-[200px] mx-auto">
-                      <div className="bg-gray-100 p-4 rounded-xl shadow-inner border border-gray-200">
-                        <h4 className="text-center font-medium text-gray-700 mb-4">Photo Preview</h4>
-                        <div className="flex flex-col gap-3 mx-auto">
+                  <div className="md:w-1/3 flex flex-col justify-start mt-3 md:mt-0">
+                    <div className="w-full max-w-[120px] mx-auto">
+                      <div className="bg-gray-100 p-2 rounded-xl shadow-inner border border-gray-200">
+                        <h4 className="text-center font-medium text-gray-700 mb-1.5 text-xs">Photo Preview</h4>
+                        <div className="flex flex-col gap-1.5 mx-auto">
                           {[0, 1, 2, 3].map((i) => (
                             <div 
                               key={i} 
                               className={`aspect-square bg-white rounded-md overflow-hidden flex items-center justify-center relative group ${
                                 capturedPhotos[i] && captureState === CaptureState.REVIEWING ? 'cursor-pointer shadow-md hover:shadow-lg transition-shadow' : 'shadow-sm'
                               }`}
+                              style={{ width: '100%' }}
                               onClick={() => capturedPhotos[i] && captureState === CaptureState.REVIEWING && retakePhoto(i)}
                             >
                               {capturedPhotos[i] ? (
@@ -327,32 +328,32 @@ const PhotoPage = () => {
                                   />
                                   {captureState === CaptureState.REVIEWING && (
                                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                      <div className="p-2 text-center">
-                                        <FaRedo className="inline-block mb-1 text-white" />
-                                        <span className="block text-white text-xs">Retake</span>
+                                      <div className="p-1 text-center">
+                                        <FaRedo className="inline-block mb-0.5 text-white text-[8px]" />
+                                        <span className="block text-white text-[8px]">Retake</span>
                                       </div>
                                     </div>
                                   )}
                                 </>
                               ) : (
                                 <div className="flex flex-col items-center justify-center h-full w-full border border-dashed border-gray-300">
-                                  <span className="text-gray-400 text-sm mb-1">{i + 1}</span>
+                                  <span className="text-gray-400 text-[10px]">{i + 1}</span>
                                   {i === currentPhotoIndex && captureState === CaptureState.CAPTURING && (
-                                    <span className="text-pink-500 text-xs animate-pulse">Capturing...</span>
+                                    <span className="text-pink-500 text-[8px] animate-pulse">Capturing...</span>
                                   )}
                                 </div>
                               )}
                             </div>
                           ))}
                         </div>
-                        <div className="mt-4 text-center">
-                          <span className="inline-block px-3 py-1 bg-pink-100 text-pink-600 rounded-full text-xs font-medium">
+                        <div className="mt-1.5 text-center">
+                          <span className="inline-block px-1.5 py-0.5 bg-pink-100 text-pink-600 rounded-full text-[8px] font-medium">
                             {capturedCount}/4 Photos
                           </span>
                         </div>
                       </div>
                       {captureState === CaptureState.REVIEWING && capturedCount > 0 && (
-                        <p className="text-sm text-gray-500 text-center mt-2">Click photos to retake</p>
+                        <p className="text-[10px] text-gray-500 text-center mt-1">Click to retake</p>
                       )}
                     </div>
                   </div>
@@ -364,7 +365,7 @@ const PhotoPage = () => {
           {/* Upload photos */}
           {activeTab === 'upload' && (
             <div className="flex flex-col items-center">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 w-full max-w-3xl mx-auto p-5 bg-gray-50 rounded-xl border border-gray-200">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4 w-full max-w-2xl mx-auto p-3 bg-gray-50 rounded-xl border border-gray-200">
                 {[0, 1, 2, 3].map((i) => (
                   <div 
                     key={i} 
@@ -382,22 +383,22 @@ const PhotoPage = () => {
                         />
                         <button
                           onClick={() => removeUploadedPhoto(i)}
-                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center shadow-md hover:bg-red-600 transition-colors"
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center shadow-md hover:bg-red-600 transition-colors"
                         >
                           ×
                         </button>
                       </>
                     ) : (
                       <div className="flex flex-col items-center justify-center h-full w-full border border-dashed border-gray-300">
-                        <span className="text-gray-400 font-medium">{i + 1}</span>
+                        <span className="text-gray-400 font-medium text-xs">{i + 1}</span>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
               
-              <label className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg flex items-center justify-center mb-4 hover:from-purple-700 hover:to-pink-600 transition cursor-pointer shadow-md">
-                <FaUpload className="mr-3 text-lg" />
+              <label className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg flex items-center justify-center mb-3 hover:from-purple-700 hover:to-pink-600 transition cursor-pointer shadow-md text-sm">
+                <FaUpload className="mr-2" />
                 <span className="font-medium">选择照片</span>
                 <input
                   type="file"
@@ -410,7 +411,7 @@ const PhotoPage = () => {
               </label>
               
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-xs text-gray-600 mb-3">
                   请上传4张照片来制作您的免费拍立得照片条。
                   {uploadedPhotos.length > 0 && uploadedPhotos.length < 4 && 
                     <span className="font-medium text-pink-600"> 还需要 {4 - uploadedPhotos.length} 张照片。</span>}
@@ -420,7 +421,7 @@ const PhotoPage = () => {
                 <button
                   onClick={proceedToResults}
                   disabled={uploadedPhotos.length !== 4}
-                  className="px-8 py-4 bg-pink-500 text-white rounded-lg inline-flex items-center justify-center hover:bg-pink-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium text-lg mt-4"
+                  className="px-6 py-2.5 bg-pink-500 text-white rounded-lg inline-flex items-center justify-center hover:bg-pink-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium text-sm"
                 >
                   创建照片条
                 </button>
