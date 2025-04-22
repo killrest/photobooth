@@ -399,7 +399,7 @@ const PhotoPage = () => {
               
               <label className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg flex items-center justify-center mb-3 hover:from-purple-700 hover:to-pink-600 transition cursor-pointer shadow-md text-sm">
                 <FaUpload className="mr-2" />
-                <span className="font-medium">选择照片</span>
+                <span className="font-medium">Choose Photos</span>
                 <input
                   type="file"
                   multiple
@@ -412,9 +412,9 @@ const PhotoPage = () => {
               
               <div className="text-center">
                 <p className="text-xs text-gray-600 mb-3">
-                  请上传4张照片来制作您的免费拍立得照片条。
+                  Please upload 4 photos to create your free photo strip.
                   {uploadedPhotos.length > 0 && uploadedPhotos.length < 4 && 
-                    <span className="font-medium text-pink-600"> 还需要 {4 - uploadedPhotos.length} 张照片。</span>}
+                    <span className="font-medium text-pink-600"> {4 - uploadedPhotos.length} more photos needed.</span>}
                 </p>
                 
                 {/* Next button */}
@@ -423,7 +423,7 @@ const PhotoPage = () => {
                   disabled={uploadedPhotos.length !== 4}
                   className="px-6 py-2.5 bg-pink-500 text-white rounded-lg inline-flex items-center justify-center hover:bg-pink-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium text-sm"
                 >
-                  创建照片条
+                  Create Photo Strip
                 </button>
               </div>
             </div>
