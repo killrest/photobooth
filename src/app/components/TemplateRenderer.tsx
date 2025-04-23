@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef } from 'react';
 import Image from 'next/image';
 import { Template } from '../constants/templates';
 
@@ -16,7 +16,7 @@ interface TemplateRendererProps {
 
 const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
   ({ template, photos, selectedStickers, stickersMap, borderColor, borderStyle, onStickerMouseDown }, ref) => {
-    const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+    // Removed unused state variables
     
     // For measuring drag events relative to container
     const containerRef = React.useRef<HTMLDivElement>(null);

@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { FaArrowLeft, FaDownload, FaRedoAlt, FaTrash, FaUndo, FaRedo } from 'react-icons/fa';
+import { FaArrowLeft, FaDownload, FaRedoAlt, FaUndo, FaRedo } from 'react-icons/fa';
 import { usePhotoContext } from '../context/PhotoContext';
 import { toPng } from 'html-to-image';
 import Layout from '../components/Layout';
@@ -144,7 +143,25 @@ const ResultPage = () => {
   const [activeSticker, setActiveSticker] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({ x: 0, y: 0 });
-
+  
+  // 使用useRef保存相关状态来避免循环依赖
+  const stateRef = useRef({
+    isDragging: false,
+    activeSticker: null as number | null,
+    selectedStickers: [] as {id: string, x: number, y: number, scale: number}[],
+    startPosition: { x: 0, y: 0 }
+  });
+  
+  // 在每次渲染时更新引用中的值
+  useEffect(() => {
+    stateRef.current = {
+      isDragging,
+      activeSticker,
+      selectedStickers,
+      startPosition
+    };
+  }, [isDragging, activeSticker, selectedStickers, startPosition]);
+  
   // Check if photos exist, redirect to photo page if not
   useEffect(() => {
     if (!photoData || !photoData.photos || photoData.photos.length === 0) {
@@ -224,29 +241,6 @@ const ResultPage = () => {
     setHistoryIndex(newHistory.length - 1);
   };
 
-  // 删除贴纸
-  const handleRemoveSticker = (index: number) => {
-    // 保存即将删除的贴纸，用于历史记录
-    const removedSticker = selectedStickers[index];
-    
-    // 更新贴纸数组
-    const newStickers = [...selectedStickers];
-    newStickers.splice(index, 1);
-    setSelectedStickers(newStickers);
-    
-    // 记录删除操作到历史
-    const newAction: HistoryAction = {
-      type: 'remove',
-      stickers: [removedSticker],
-      index: index
-    };
-    
-    // 如果已经撤销过操作，需要清除那些被撤销的操作历史
-    const newHistory = history.slice(0, historyIndex + 1).concat(newAction);
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-  };
-  
   // 撤销操作
   const handleUndo = () => {
     if (historyIndex < 0) return; // 没有可撤销的操作
@@ -321,52 +315,10 @@ const ResultPage = () => {
     handleMouseDown(e, index);
   };
   
-  // 贴纸拖拽 - 鼠标移动
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || activeSticker === null) return;
-    
-    e.preventDefault();
-    
-    const photoGridElement = photoGridRef.current;
-    if (!photoGridElement) return;
-    
-    const rect = photoGridElement.getBoundingClientRect();
-    
-    // 计算移动的像素
-    const deltaX = e.clientX - startPosition.x;
-    const deltaY = e.clientY - startPosition.y;
-    
-    // 将像素转换为百分比
-    const percentX = (deltaX / rect.width) * 100;
-    const percentY = (deltaY / rect.height) * 100;
-    
-    // 更新贴纸位置
-    const updatedStickers = [...selectedStickers];
-    const sticker = updatedStickers[activeSticker];
-    
-    updatedStickers[activeSticker] = {
-      ...sticker,
-      x: Math.max(0, Math.min(100, sticker.x + percentX)),
-      y: Math.max(0, Math.min(100, sticker.y + percentY))
-    };
-    
-    setSelectedStickers(updatedStickers);
-    setStartPosition({
-      x: e.clientX,
-      y: e.clientY
-    });
-  };
-  
-  // 贴纸拖拽 - 鼠标松开
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    setActiveSticker(null);
-    document.removeEventListener('mousemove', handleGlobalMouseMove);
-    document.removeEventListener('mouseup', handleGlobalMouseUp);
-  };
-  
   // 全局鼠标移动处理 - 用于在拖出元素范围时继续跟踪
-  const handleGlobalMouseMove = (e: MouseEvent) => {
+  const handleGlobalMouseMove = useCallback((e: MouseEvent) => {
+    const { isDragging, activeSticker, selectedStickers, startPosition } = stateRef.current;
+    
     if (!isDragging || activeSticker === null) return;
     
     e.preventDefault();
@@ -399,15 +351,15 @@ const ResultPage = () => {
       x: e.clientX,
       y: e.clientY
     });
-  };
+  }, [photoGridRef]);
   
   // 全局鼠标松开处理
-  const handleGlobalMouseUp = () => {
+  const handleGlobalMouseUp = useCallback(() => {
     setIsDragging(false);
     setActiveSticker(null);
     document.removeEventListener('mousemove', handleGlobalMouseMove);
     document.removeEventListener('mouseup', handleGlobalMouseUp);
-  };
+  }, [handleGlobalMouseMove]);
   
   // 确保在组件卸载时移除全局事件监听
   useEffect(() => {
@@ -415,7 +367,7 @@ const ResultPage = () => {
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, []);
+  }, [handleGlobalMouseMove, handleGlobalMouseUp]);
 
   // 下载照片
   const handleDownload = async () => {
