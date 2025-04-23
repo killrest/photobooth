@@ -8,6 +8,9 @@ import { FaArrowLeft, FaDownload, FaRedoAlt, FaTrash, FaUndo, FaRedo } from 'rea
 import { usePhotoContext } from '../context/PhotoContext';
 import { toPng } from 'html-to-image';
 import Layout from '../components/Layout';
+import TemplateRenderer from '../components/TemplateRenderer';
+import TemplateSelector from '../components/TemplateSelector';
+import templates from '../constants/templates';
 
 // Frame color options
 const frameColors = [
@@ -50,6 +53,12 @@ const stickers = [
   { id: 'unicorn', name: 'Unicorn', icon: '🦄' },
   { id: 'cloud', name: 'Cloud', icon: '☁️' },
 ];
+
+// Create stickers map for easier lookup
+const stickersMap = stickers.reduce((acc, sticker) => {
+  acc[sticker.id] = sticker.icon;
+  return acc;
+}, {} as Record<string, string>);
 
 // 生成随机位置函数 - 增强版
 const getRandomPosition = () => {
@@ -125,6 +134,7 @@ const ResultPage = () => {
   const [selectedColor, setSelectedColor] = useState('lightBlue');
   const [selectedStickers, setSelectedStickers] = useState<{id: string, x: number, y: number, scale: number}[]>([]);
   const photoGridRef = useRef<HTMLDivElement>(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState('default');
   
   // 历史记录状态
   const [history, setHistory] = useState<HistoryAction[]>([]);
@@ -137,10 +147,18 @@ const ResultPage = () => {
 
   // Check if photos exist, redirect to photo page if not
   useEffect(() => {
-    if (!photoData || !photoData.photos || photoData.photos.length !== 4) {
+    if (!photoData || !photoData.photos || photoData.photos.length === 0) {
       router.push('/photo');
     }
   }, [photoData, router]);
+
+  // Find the selected template
+  const selectedTemplate = templates.find(t => t.id === selectedTemplateId) || templates[0];
+
+  // Select template
+  const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplateId(templateId);
+  };
 
   // Select frame color
   const handleColorSelect = (colorId: string) => {
@@ -263,10 +281,11 @@ const ResultPage = () => {
       // 重做添加操作：重新添加贴纸
       setSelectedStickers(prevStickers => [...prevStickers, ...actionToRedo.stickers]);
     } else if (actionToRedo.type === 'remove') {
-      // 重做删除操作：重新删除贴纸
-      if (actionToRedo.index !== undefined) {
+      // 重做删除操作：再次删除贴纸
+      const index = actionToRedo.index !== undefined ? actionToRedo.index : -1;
+      if (index >= 0) {
         const newStickers = [...selectedStickers];
-        newStickers.splice(actionToRedo.index, 1);
+        newStickers.splice(index, 1);
         setSelectedStickers(newStickers);
       }
     }
@@ -274,19 +293,15 @@ const ResultPage = () => {
     // 更新历史索引
     setHistoryIndex(historyIndex + 1);
   };
-
-  // 判断是否可以撤销/重做
+  
+  // 快捷用于检查是否可以撤销/重做
   const canUndo = historyIndex >= 0;
   const canRedo = historyIndex < history.length - 1;
-
-  // 鼠标按下事件
+  
+  // 贴纸拖拽 - 鼠标按下
   const handleMouseDown = (e: React.MouseEvent, index: number) => {
-    if (!photoGridRef.current) return;
-    
-    // 阻止拖放默认行为
     e.preventDefault();
     
-    // 激活当前贴纸
     setActiveSticker(index);
     setIsDragging(true);
     
@@ -295,123 +310,136 @@ const ResultPage = () => {
       x: e.clientX,
       y: e.clientY
     });
+    
+    // 添加全局鼠标事件
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+    document.addEventListener('mouseup', handleGlobalMouseUp);
   };
 
-  // 鼠标移动事件 - 处理拖拽
+  // Enable sticker dragging in the TemplateRenderer
+  const handleTemplateMouseDown = (e: React.MouseEvent, index: number) => {
+    handleMouseDown(e, index);
+  };
+  
+  // 贴纸拖拽 - 鼠标移动
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || activeSticker === null || !photoGridRef.current) return;
+    if (!isDragging || activeSticker === null) return;
     
-    // 计算位移
+    e.preventDefault();
+    
+    const photoGridElement = photoGridRef.current;
+    if (!photoGridElement) return;
+    
+    const rect = photoGridElement.getBoundingClientRect();
+    
+    // 计算移动的像素
     const deltaX = e.clientX - startPosition.x;
     const deltaY = e.clientY - startPosition.y;
     
-    // 获取容器尺寸，用于计算百分比移动
-    const containerRect = photoGridRef.current.getBoundingClientRect();
-    
-    // 计算位移的百分比变化
-    const deltaXPercent = (deltaX / containerRect.width) * 100;
-    const deltaYPercent = (deltaY / containerRect.height) * 100;
+    // 将像素转换为百分比
+    const percentX = (deltaX / rect.width) * 100;
+    const percentY = (deltaY / rect.height) * 100;
     
     // 更新贴纸位置
     const updatedStickers = [...selectedStickers];
     const sticker = updatedStickers[activeSticker];
     
-    // 更新位置，同时确保不超出边界（5% - 95%）
     updatedStickers[activeSticker] = {
       ...sticker,
-      x: Math.max(5, Math.min(95, sticker.x + deltaXPercent)),
-      y: Math.max(5, Math.min(95, sticker.y + deltaYPercent))
+      x: Math.max(0, Math.min(100, sticker.x + percentX)),
+      y: Math.max(0, Math.min(100, sticker.y + percentY))
     };
     
-    // 更新状态
     setSelectedStickers(updatedStickers);
     setStartPosition({
       x: e.clientX,
       y: e.clientY
     });
   };
-
-  // 鼠标释放事件
+  
+  // 贴纸拖拽 - 鼠标松开
   const handleMouseUp = () => {
     setIsDragging(false);
     setActiveSticker(null);
+    document.removeEventListener('mousemove', handleGlobalMouseMove);
+    document.removeEventListener('mouseup', handleGlobalMouseUp);
   };
-
-  // 在组件销毁时移除全局事件监听器
+  
+  // 全局鼠标移动处理 - 用于在拖出元素范围时继续跟踪
+  const handleGlobalMouseMove = (e: MouseEvent) => {
+    if (!isDragging || activeSticker === null) return;
+    
+    e.preventDefault();
+    
+    const photoGridElement = photoGridRef.current;
+    if (!photoGridElement) return;
+    
+    const rect = photoGridElement.getBoundingClientRect();
+    
+    // 计算移动的像素
+    const deltaX = e.clientX - startPosition.x;
+    const deltaY = e.clientY - startPosition.y;
+    
+    // 将像素转换为百分比
+    const percentX = (deltaX / rect.width) * 100;
+    const percentY = (deltaY / rect.height) * 100;
+    
+    // 更新贴纸位置
+    const updatedStickers = [...selectedStickers];
+    const sticker = updatedStickers[activeSticker];
+    
+    updatedStickers[activeSticker] = {
+      ...sticker,
+      x: Math.max(0, Math.min(100, sticker.x + percentX)),
+      y: Math.max(0, Math.min(100, sticker.y + percentY))
+    };
+    
+    setSelectedStickers(updatedStickers);
+    setStartPosition({
+      x: e.clientX,
+      y: e.clientY
+    });
+  };
+  
+  // 全局鼠标松开处理
+  const handleGlobalMouseUp = () => {
+    setIsDragging(false);
+    setActiveSticker(null);
+    document.removeEventListener('mousemove', handleGlobalMouseMove);
+    document.removeEventListener('mouseup', handleGlobalMouseUp);
+  };
+  
+  // 确保在组件卸载时移除全局事件监听
   useEffect(() => {
-    // 注册全局鼠标事件，保证拖拽时鼠标移出元素仍能正常工作
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (isDragging && activeSticker !== null && photoGridRef.current) {
-        const containerRect = photoGridRef.current.getBoundingClientRect();
-        const deltaX = e.clientX - startPosition.x;
-        const deltaY = e.clientY - startPosition.y;
-        
-        // 计算位移的百分比变化
-        const deltaXPercent = (deltaX / containerRect.width) * 100;
-        const deltaYPercent = (deltaY / containerRect.height) * 100;
-        
-        // 更新贴纸位置
-        const updatedStickers = [...selectedStickers];
-        const sticker = updatedStickers[activeSticker];
-        
-        updatedStickers[activeSticker] = {
-          ...sticker,
-          x: Math.max(5, Math.min(95, sticker.x + deltaXPercent)),
-          y: Math.max(5, Math.min(95, sticker.y + deltaYPercent))
-        };
-        
-        setSelectedStickers(updatedStickers);
-        setStartPosition({
-          x: e.clientX,
-          y: e.clientY
-        });
-      }
-    };
-    
-    const handleGlobalMouseUp = () => {
-      setIsDragging(false);
-      setActiveSticker(null);
-    };
-    
-    // 添加全局事件监听
-    document.addEventListener('mousemove', handleGlobalMouseMove);
-    document.addEventListener('mouseup', handleGlobalMouseUp);
-    
-    // 清理函数
     return () => {
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [isDragging, activeSticker, selectedStickers, startPosition, photoGridRef]);
+  }, []);
 
-  // Download photo
+  // 下载照片
   const handleDownload = async () => {
-    if (photoGridRef.current) {
-      try {
-        const dataUrl = await toPng(photoGridRef.current, { 
-          cacheBust: true,
-          quality: 0.95,
-          backgroundColor: '#ffffff'
-        });
-        
-        // Create download link
-        const link = document.createElement('a');
-        link.download = `free-photobooth-strip-${new Date().toISOString().slice(0, 10)}.png`;
-        link.href = dataUrl;
-        link.click();
-      } catch (error) {
-        console.error('Failed to export photo:', error);
-        alert('Failed to export photo. Please try again!');
-      }
+    if (!photoGridRef.current) return;
+    
+    try {
+      const dataUrl = await toPng(photoGridRef.current, { quality: 0.95 });
+      
+      // 创建下载链接
+      const link = document.createElement('a');
+      link.download = 'kacakacabooth-photobooth.png';
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('Error generating image', error);
     }
   };
 
-  // Retake photos
+  // 重新拍照
   const handleRetake = () => {
     router.push('/photo');
   };
 
-  // Get current frame color
+  // 获取边框颜色样式
   const getBorderColor = () => {
     const colorOption = frameColors.find(c => c.id === selectedColor);
     if (!colorOption) return 'none';
@@ -443,133 +471,96 @@ const ResultPage = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-4 max-w-6xl mx-auto">
-          <h2 className="text-xl font-bold text-center mb-8">Free Online Photo Booth - Create & Customize Your Photo Strip</h2>
+          <h2 className="text-xl font-bold text-center mb-8 text-pink-600">Free Online Photo Booth - Create & Customize Your Photo Strip</h2>
           
           <div className="flex flex-col md:flex-row gap-6">
             {/* Left side photo display */}
             <div className="md:w-2/5 flex flex-col items-center justify-start">
-              <div 
+              <TemplateRenderer
                 ref={photoGridRef}
-                className="relative bg-white p-2 rounded-md w-full max-w-[280px]"
-                style={typeof getBorderColor() === 'object' 
-                  ? getBorderColor() as React.CSSProperties 
-                  : { border: getBorderColor() as string }
-                }
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-              >
-                <div className="grid grid-cols-1 gap-1">
-                  {photoData && photoData.photos && photoData.photos.map((photo: string, index: number) => (
-                    <div key={index} className="relative">
-                      <Image 
-                        src={photo} 
-                        alt={`Photo ${index+1}`} 
-                        className="w-full rounded-sm"
-                        style={{ aspectRatio: '1/1', objectFit: 'cover' }}
-                        width={500}
-                        height={500}
-                        unoptimized
-                      />
-                    </div>
-                  ))}
-                  
-                  {/* Stickers layer */}
-                  {selectedStickers.map((sticker, index) => (
-                    <div 
-                      key={index}
-                      className={`absolute cursor-move ${activeSticker === index ? 'ring-2 ring-pink-500' : ''}`}
-                      style={{
-                        top: `${sticker.y}%`,
-                        left: `${sticker.x}%`,
-                        transform: 'translate(-50%, -50%)',
-                        zIndex: 10 + index,
-                        fontSize: '24px',
-                        transition: isDragging && activeSticker === index ? 'none' : 'all 0.1s ease'
-                      }}
-                      onMouseDown={(e) => handleMouseDown(e, index)}
-                    >
-                      <div className="relative group">
-                        <span style={{ fontSize: `${sticker.scale * 24}px` }}>
-                          {stickers.find(s => s.id === sticker.id)?.icon || '❤️'}
-                        </span>
-                        
-                        {/* 删除按钮 - 悬停时显示 */}
-                        <button 
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center 
-                                     opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveSticker(index);
-                          }}
-                        >
-                          <FaTrash size={8} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="text-center text-xs text-gray-500 mt-2">
-                  KacaKacaBooth Free Photo Booth
-                </div>
-              </div>
+                template={selectedTemplate}
+                photos={photoData?.photos || []}
+                selectedStickers={selectedStickers}
+                stickersMap={stickersMap}
+                borderColor={getBorderColor() as string}
+                borderStyle={typeof getBorderColor() === 'object' ? getBorderColor() as React.CSSProperties : undefined}
+                onStickerMouseDown={handleTemplateMouseDown}
+              />
             </div>
             
             {/* Right side tools */}
             <div className="md:w-3/5">
               <div className="bg-pink-50 bg-opacity-70 rounded-lg p-5">
-                {/* Frame color */}
-                <div className="mb-6">
-                  <h3 className="text-md font-semibold mb-3">Frame Color for Your Photo Booth Strip</h3>
-                  <div className="grid grid-cols-8 gap-2">
-                    {frameColors.slice(0, 16).map((color) => (
-                      <button
-                        key={color.id}
-                        className={`w-9 h-9 rounded-full ${selectedColor === color.id ? 'ring-2 ring-pink-500 ring-offset-2' : ''} transition-all`}
-                        style={{ 
-                          background: color.color === 'transparent' 
-                            ? '#f3f4f6' 
-                            : color.id === 'rainbow'
-                              ? color.color
-                              : color.color 
-                        }}
-                        onClick={() => handleColorSelect(color.id)}
-                        title={color.name}
-                      >
-                        {color.id === 'none' && (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                            ∅
-                          </div>
-                        )}
-                      </button>
-                    ))}
+                {/* Template selection */}
+                <TemplateSelector
+                  templates={templates}
+                  selectedTemplateId={selectedTemplateId}
+                  onSelectTemplate={handleTemplateSelect}
+                />
+                
+                {/* Frame color - only show for default template */}
+                {selectedTemplateId === 'default' && (
+                  <div className="mb-6">
+                    <h3 className="text-md font-semibold mb-3 text-pink-600">Frame Color for Your Photo Booth Strip</h3>
+                    <div className="grid grid-cols-8 gap-2">
+                      {frameColors.slice(0, 16).map((color) => (
+                        <button
+                          key={color.id}
+                          className={`w-9 h-9 rounded-full ${selectedColor === color.id ? 'ring-2 ring-pink-500 ring-offset-2' : ''} transition-all`}
+                          style={{ 
+                            background: color.color === 'transparent' 
+                              ? '#f3f4f6' 
+                              : color.id === 'rainbow'
+                                ? color.color
+                                : color.color 
+                          }}
+                          onClick={() => handleColorSelect(color.id)}
+                          title={color.name}
+                        >
+                          {color.id === 'none' && (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                              ∅
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* Stickers */}
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-md font-semibold">Stickers for Your Online Photo Booth</h3>
+                    <h3 className="text-md font-semibold text-pink-600">Stickers for Your Online Photo Booth</h3>
                   </div>
                   
-                  {/* 添加撤销/重做按钮在贴纸区域的顶部 */}
+                  {/* Undo/Redo buttons */}
                   <div className="flex justify-center gap-3 mb-4">
                     <button
-                      className={`flex-1 px-3 py-2 rounded-md flex items-center justify-center ${canUndo ? 'bg-white text-pink-600 border border-pink-200 hover:bg-pink-50' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                      className={`flex-1 px-3 py-2.5 rounded-full flex items-center justify-center transition-all shadow-sm ${
+                        canUndo 
+                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white hover:shadow-md hover:from-pink-600 hover:to-pink-700' 
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      }`}
                       onClick={handleUndo}
                       disabled={!canUndo}
                       title="Undo last sticker action"
                     >
                       <FaUndo className="mr-2" size={14} />
-                      Undo Stickers
+                      Undo
                     </button>
                     <button
-                      className={`flex-1 px-3 py-2 rounded-md flex items-center justify-center ${canRedo ? 'bg-white text-pink-600 border border-pink-200 hover:bg-pink-50' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
+                      className={`flex-1 px-3 py-2.5 rounded-full flex items-center justify-center transition-all shadow-sm ${
+                        canRedo 
+                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white hover:shadow-md hover:from-pink-600 hover:to-pink-700' 
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      }`}
                       onClick={handleRedo}
                       disabled={!canRedo}
                       title="Redo last undone sticker action"
                     >
                       <FaRedo className="mr-2" size={14} />
-                      Redo Stickers
+                      Redo
                     </button>
                   </div>
                   
