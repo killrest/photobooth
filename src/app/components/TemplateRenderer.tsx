@@ -18,7 +18,7 @@ interface TemplateRendererProps {
 const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
   ({ template, photos, selectedStickers, stickersMap, borderColor, borderStyle, onStickerMouseDown, onStickerDelete }, ref) => {
     // For measuring drag events relative to container
-    const containerRef = React.useRef<HTMLDivElement>(null);
+    const containerRef = React.useRef<HTMLDivElement | null>(null);
     
     // Default template (original photo strip)
     if (template.id === 'default') {
@@ -147,9 +147,8 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
           } else if (ref) {
             ref.current = el;
           }
-          if (containerRef) {
-            containerRef.current = el;
-          }
+          // Store in containerRef for internal use
+          containerRef.current = el;
         }}
         className="relative bg-white rounded-md w-full max-w-[280px]"
         style={{ 
