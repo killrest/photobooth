@@ -122,7 +122,7 @@ const getRandomScale = (): number => {
 
 // 定义操作历史类型
 type HistoryAction = {
-  type: 'add' | 'remove';  // 操作类型：添加或删除
+  type: 'add' | 'remove' | 'removeSingle';  // 操作类型：添加或删除或单个删除
   stickers: {id: string, x: number, y: number, scale: number}[];  // 相关贴纸
   index?: number;  // 删除操作的索引
 };
@@ -161,7 +161,7 @@ const ResultPage = () => {
       startPosition
     };
   }, [isDragging, activeSticker, selectedStickers, startPosition]);
-  
+
   // Check if photos exist, redirect to photo page if not
   useEffect(() => {
     if (!photoData || !photoData.photos || photoData.photos.length === 0) {
@@ -180,6 +180,8 @@ const ResultPage = () => {
   // Select frame color
   const handleColorSelect = (colorId: string) => {
     setSelectedColor(colorId);
+    // Switch to the default template when a color is selected
+    setSelectedTemplateId('default');
   };
 
   // 选择贴纸数量范围 - 根据贴纸类型决定
@@ -241,6 +243,29 @@ const ResultPage = () => {
     setHistoryIndex(newHistory.length - 1);
   };
 
+  // 删除单个贴纸
+  const handleDeleteSticker = (index: number) => {
+    // 保存要删除的贴纸信息，用于历史记录
+    const deletedSticker = selectedStickers[index];
+    
+    // 创建新的贴纸数组，移除指定索引的贴纸
+    const newStickers = [...selectedStickers];
+    newStickers.splice(index, 1);
+    setSelectedStickers(newStickers);
+    
+    // 记录删除操作到历史
+    const newAction: HistoryAction = {
+      type: 'removeSingle',
+      stickers: [deletedSticker],
+      index: index
+    };
+    
+    // 如果已经撤销过操作，需要清除那些被撤销的操作历史
+    const newHistory = history.slice(0, historyIndex + 1).concat(newAction);
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  };
+  
   // 撤销操作
   const handleUndo = () => {
     if (historyIndex < 0) return; // 没有可撤销的操作
@@ -251,7 +276,7 @@ const ResultPage = () => {
       // 撤销添加操作：移除添加的贴纸
       const stickerCount = actionToUndo.stickers.length;
       setSelectedStickers(prevStickers => prevStickers.slice(0, -stickerCount));
-    } else if (actionToUndo.type === 'remove') {
+    } else if (actionToUndo.type === 'remove' || actionToUndo.type === 'removeSingle') {
       // 撤销删除操作：恢复删除的贴纸
       const stickerToRestore = actionToUndo.stickers[0];
       const insertIndex = actionToUndo.index !== undefined ? actionToUndo.index : selectedStickers.length;
@@ -274,7 +299,7 @@ const ResultPage = () => {
     if (actionToRedo.type === 'add') {
       // 重做添加操作：重新添加贴纸
       setSelectedStickers(prevStickers => [...prevStickers, ...actionToRedo.stickers]);
-    } else if (actionToRedo.type === 'remove') {
+    } else if (actionToRedo.type === 'remove' || actionToRedo.type === 'removeSingle') {
       // 重做删除操作：再次删除贴纸
       const index = actionToRedo.index !== undefined ? actionToRedo.index : -1;
       if (index >= 0) {
@@ -287,11 +312,11 @@ const ResultPage = () => {
     // 更新历史索引
     setHistoryIndex(historyIndex + 1);
   };
-  
+
   // 快捷用于检查是否可以撤销/重做
   const canUndo = historyIndex >= 0;
   const canRedo = historyIndex < history.length - 1;
-  
+
   // 贴纸拖拽 - 鼠标按下
   const handleMouseDown = (e: React.MouseEvent, index: number) => {
     e.preventDefault();
@@ -352,7 +377,7 @@ const ResultPage = () => {
       y: e.clientY
     });
   }, [photoGridRef]);
-  
+
   // 全局鼠标松开处理
   const handleGlobalMouseUp = useCallback(() => {
     setIsDragging(false);
@@ -360,7 +385,7 @@ const ResultPage = () => {
     document.removeEventListener('mousemove', handleGlobalMouseMove);
     document.removeEventListener('mouseup', handleGlobalMouseUp);
   }, [handleGlobalMouseMove]);
-  
+
   // 确保在组件卸载时移除全局事件监听
   useEffect(() => {
     return () => {
@@ -373,15 +398,15 @@ const ResultPage = () => {
   const handleDownload = async () => {
     if (!photoGridRef.current) return;
     
-    try {
+      try {
       const dataUrl = await toPng(photoGridRef.current, { quality: 0.95 });
-      
+        
       // 创建下载链接
-      const link = document.createElement('a');
+        const link = document.createElement('a');
       link.download = 'kacakacabooth-photobooth.png';
-      link.href = dataUrl;
-      link.click();
-    } catch (error) {
+        link.href = dataUrl;
+        link.click();
+      } catch (error) {
       console.error('Error generating image', error);
     }
   };
@@ -416,14 +441,14 @@ const ResultPage = () => {
     <Layout>
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center mb-4">
-          <Link href="/" className="flex items-center text-gray-700 hover:text-pink-600 transition text-sm">
+          <Link href="/" className="flex items-center text-gray-700 hover:text-amber-700 transition text-sm">
             <FaArrowLeft className="mr-1" />
             Back to Home
           </Link>
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-4 max-w-6xl mx-auto">
-          <h2 className="text-xl font-bold text-center mb-8 text-pink-600">Free Online Photo Booth - Create & Customize Your Photo Strip</h2>
+          <h2 className="text-xl font-bold text-center mb-8 text-amber-700">Free Online Photo Booth - Create & Customize Your Photo Strip</h2>
           
           <div className="flex flex-col md:flex-row gap-6">
             {/* Left side photo display */}
@@ -437,83 +462,52 @@ const ResultPage = () => {
                 borderColor={getBorderColor() as string}
                 borderStyle={typeof getBorderColor() === 'object' ? getBorderColor() as React.CSSProperties : undefined}
                 onStickerMouseDown={handleTemplateMouseDown}
+                onStickerDelete={handleDeleteSticker}
               />
             </div>
             
             {/* Right side tools */}
             <div className="md:w-3/5">
-              <div className="bg-pink-50 bg-opacity-70 rounded-lg p-5">
+              <div className="bg-cream-50 bg-opacity-70 rounded-lg p-5">
+                {/* Frame color - always visible */}
+                <div className="mb-6">
+                  <h3 className="text-md font-semibold mb-3 text-amber-700">Frame Color</h3>
+                  <div className="grid grid-cols-8 gap-2">
+                    {frameColors.slice(0, 16).map((color) => (
+                      <button
+                        key={color.id}
+                        className={`w-9 h-9 rounded-full ${selectedColor === color.id ? 'ring-2 ring-amber-500 ring-offset-2' : ''} transition-all`}
+                        style={{ 
+                          background: color.color === 'transparent' 
+                            ? '#f3f4f6' 
+                            : color.id === 'rainbow'
+                              ? color.color
+                              : color.color 
+                        }}
+                        onClick={() => handleColorSelect(color.id)}
+                        title={color.name}
+                      >
+                        {color.id === 'none' && (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                            ∅
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
                 {/* Template selection */}
                 <TemplateSelector
-                  templates={templates}
+                  templates={templates.filter(t => t.id !== 'default')}
                   selectedTemplateId={selectedTemplateId}
                   onSelectTemplate={handleTemplateSelect}
                 />
                 
-                {/* Frame color - only show for default template */}
-                {selectedTemplateId === 'default' && (
-                  <div className="mb-6">
-                    <h3 className="text-md font-semibold mb-3 text-pink-600">Frame Color for Your Photo Booth Strip</h3>
-                    <div className="grid grid-cols-8 gap-2">
-                      {frameColors.slice(0, 16).map((color) => (
-                        <button
-                          key={color.id}
-                          className={`w-9 h-9 rounded-full ${selectedColor === color.id ? 'ring-2 ring-pink-500 ring-offset-2' : ''} transition-all`}
-                          style={{ 
-                            background: color.color === 'transparent' 
-                              ? '#f3f4f6' 
-                              : color.id === 'rainbow'
-                                ? color.color
-                                : color.color 
-                          }}
-                          onClick={() => handleColorSelect(color.id)}
-                          title={color.name}
-                        >
-                          {color.id === 'none' && (
-                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                              ∅
-                            </div>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
                 {/* Stickers */}
                 <div>
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-md font-semibold text-pink-600">Stickers for Your Online Photo Booth</h3>
-                  </div>
-                  
-                  {/* Undo/Redo buttons */}
-                  <div className="flex justify-center gap-3 mb-4">
-                    <button
-                      className={`flex-1 px-3 py-2.5 rounded-full flex items-center justify-center transition-all shadow-sm ${
-                        canUndo 
-                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white hover:shadow-md hover:from-pink-600 hover:to-pink-700' 
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      }`}
-                      onClick={handleUndo}
-                      disabled={!canUndo}
-                      title="Undo last sticker action"
-                    >
-                      <FaUndo className="mr-2" size={14} />
-                      Undo
-                    </button>
-                    <button
-                      className={`flex-1 px-3 py-2.5 rounded-full flex items-center justify-center transition-all shadow-sm ${
-                        canRedo 
-                          ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white hover:shadow-md hover:from-pink-600 hover:to-pink-700' 
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      }`}
-                      onClick={handleRedo}
-                      disabled={!canRedo}
-                      title="Redo last undone sticker action"
-                    >
-                      <FaRedo className="mr-2" size={14} />
-                      Redo
-                    </button>
+                    <h3 className="text-md font-semibold text-amber-700">Stickers</h3>
                   </div>
                   
                   <div className="grid grid-cols-7 gap-2">
@@ -529,8 +523,38 @@ const ResultPage = () => {
                     ))}
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
-                    Click to add sticker groups, drag to adjust position. Use Undo/Redo buttons to manage sticker changes.
+                    Click to add sticker groups, drag to adjust position. Hover over any sticker to delete it individually. Use Undo/Redo buttons to manage all sticker changes.
                   </p>
+                  
+                  {/* Undo/Redo buttons - Moved below stickers */}
+                  <div className="flex justify-center gap-3 mt-4 mb-2">
+                    <button
+                      className={`flex-1 px-3 py-2.5 rounded-full flex items-center justify-center transition-all shadow-sm ${
+                        canUndo 
+                          ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:shadow-md hover:from-amber-600 hover:to-amber-700' 
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      }`}
+                      onClick={handleUndo}
+                      disabled={!canUndo}
+                      title="Undo last sticker action"
+                    >
+                      <FaUndo className="mr-2" size={14} />
+                      Undo
+                    </button>
+                    <button
+                      className={`flex-1 px-3 py-2.5 rounded-full flex items-center justify-center transition-all shadow-sm ${
+                        canRedo 
+                          ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white hover:shadow-md hover:from-amber-600 hover:to-amber-700' 
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      }`}
+                      onClick={handleRedo}
+                      disabled={!canRedo}
+                      title="Redo last undone sticker action"
+                    >
+                      <FaRedo className="mr-2" size={14} />
+                      Redo
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -539,14 +563,14 @@ const ResultPage = () => {
           {/* Bottom action buttons */}
           <div className="flex justify-center gap-4 mt-8">
             <button
-              className="px-10 py-3 bg-pink-500 text-white rounded-full shadow-md flex items-center justify-center hover:bg-pink-600 transition text-sm font-medium"
+              className="px-10 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full shadow-md flex items-center justify-center hover:from-amber-600 hover:to-amber-700 transition text-sm font-bold"
               onClick={handleDownload}
             >
               <FaDownload className="mr-2" />
               Download Photo Strip
             </button>
             <button
-              className="px-10 py-3 bg-white text-gray-800 border border-gray-200 rounded-full shadow-md flex items-center justify-center hover:bg-gray-100 transition text-sm font-medium"
+              className="px-10 py-3 bg-white border border-amber-500 text-amber-700 rounded-full shadow-md flex items-center justify-center hover:bg-cream-100 transition text-sm font-bold"
               onClick={handleRetake}
             >
               <FaRedoAlt className="mr-2" />

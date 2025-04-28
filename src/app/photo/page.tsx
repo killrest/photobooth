@@ -166,7 +166,7 @@ const PhotoPage = () => {
       <div className="container mx-auto px-3 pt-0 pb-2">
         {/* Back Button with reduced spacing */}
         <div className="flex items-center mb-1">
-          <Link href="/" className="flex items-center text-gray-700 hover:text-pink-600 transition text-sm">
+          <Link href="/" className="flex items-center text-gray-700 hover:text-amber-700 transition text-sm">
             <FaArrowLeft className="mr-1" />
             Back to Home
           </Link>
@@ -179,7 +179,7 @@ const PhotoPage = () => {
           {/* Tab switching */}
           <div className="flex border-b mb-3">
             <button
-              className={`flex-1 py-2 font-medium text-base ${activeTab === 'capture' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-500'}`}
+              className={`flex-1 py-2 font-medium text-base ${activeTab === 'capture' ? 'text-amber-700 border-b-2 border-amber-600' : 'text-gray-500'}`}
               onClick={() => {
                 setActiveTab('capture');
                 setCaptureState(CaptureState.SELECTING_FILTER);
@@ -191,7 +191,7 @@ const PhotoPage = () => {
               Use Camera
             </button>
             <button
-              className={`flex-1 py-2 font-medium text-base ${activeTab === 'upload' ? 'text-pink-600 border-b-2 border-pink-600' : 'text-gray-500'}`}
+              className={`flex-1 py-2 font-medium text-base ${activeTab === 'upload' ? 'text-amber-700 border-b-2 border-amber-600' : 'text-gray-500'}`}
               onClick={() => setActiveTab('upload')}
             >
               <FaUpload className="inline mr-2" />
@@ -207,7 +207,7 @@ const PhotoPage = () => {
                   <p className="text-red-600 mb-2 text-sm">Unable to access camera. Please ensure you have granted camera permissions, or use the photo upload feature.</p>
                   <button
                     onClick={() => setActiveTab('upload')}
-                    className="px-3 py-1.5 bg-pink-600 text-white rounded-md text-sm"
+                    className="px-3 py-1.5 bg-amber-600 text-white rounded-md text-sm"
                   >
                     Switch to Upload Mode
                   </button>
@@ -253,7 +253,7 @@ const PhotoPage = () => {
                               onClick={() => handleFilterSelect(filter.id)}
                               className={`px-2 py-1.5 rounded-md font-medium text-sm transition-all duration-200 ${
                                 selectedFilter === filter.id 
-                                  ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-md' 
+                                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md' 
                                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-300'
                               }`}
                             >
@@ -264,7 +264,7 @@ const PhotoPage = () => {
                         
                         <button
                           onClick={startCapture}
-                          className="w-full px-4 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md flex items-center justify-center hover:opacity-90 transition mt-2 shadow-md font-medium text-base"
+                          className="w-full px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-md flex items-center justify-center hover:opacity-90 transition mt-2 shadow-md font-medium text-base"
                         >
                           <FaCamera className="mr-2" />
                           Start Taking Photos
@@ -296,7 +296,7 @@ const PhotoPage = () => {
                         <button
                           onClick={proceedToResults}
                           disabled={capturedPhotos.includes(null)}
-                          className="flex-1 px-3 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md flex items-center justify-center hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium text-sm"
+                          className="flex-1 px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-md flex items-center justify-center hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium text-sm"
                         >
                           Next Step
                         </button>
@@ -335,7 +335,7 @@ const PhotoPage = () => {
                                 </div>
                               </div>
                             )}
-                            <div className="absolute top-0 left-0 bg-pink-500 text-white text-xs py-0.5 px-1 rounded-br-md">
+                            <div className="absolute top-0 left-0 bg-cream-500 text-white text-xs py-0.5 px-1 rounded-br-md">
                               {i + 1}
                             </div>
                           </>
@@ -356,7 +356,7 @@ const PhotoPage = () => {
                 <p className="text-center text-gray-600 mb-4 text-sm">
                   Upload 4 photos to create your custom photo strip.
                   {uploadedPhotos.length > 0 && uploadedPhotos.length < 4 && 
-                    <span className="font-medium text-pink-600"> {4 - uploadedPhotos.length} more photos needed.</span>}
+                    <span className="font-medium text-amber-700"> {4 - uploadedPhotos.length} more photos needed.</span>}
                 </p>
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
@@ -381,7 +381,7 @@ const PhotoPage = () => {
                           >
                             ×
                           </button>
-                          <div className="absolute top-0 left-0 bg-pink-500 text-white text-xs py-0.5 px-1.5 rounded-br-md">
+                          <div className="absolute top-0 left-0 bg-cream-500 text-white text-xs py-0.5 px-1.5 rounded-br-md">
                             {i + 1}
                           </div>
                         </>
@@ -396,7 +396,7 @@ const PhotoPage = () => {
                 </div>
                 
                 <div className="flex flex-col items-center">
-                  <label className="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg flex items-center justify-center mb-3 hover:opacity-90 transition cursor-pointer shadow-md font-medium">
+                  <label className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg flex items-center justify-center mb-3 hover:opacity-90 transition cursor-pointer shadow-md font-medium">
                     <FaUpload className="mr-2" />
                     <span>Choose Photos</span>
                     <input
@@ -413,7 +413,7 @@ const PhotoPage = () => {
                   <button
                     onClick={proceedToResults}
                     disabled={uploadedPhotos.length !== 4}
-                    className="px-5 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg inline-flex items-center justify-center hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium w-full max-w-xs"
+                    className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-lg inline-flex items-center justify-center hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium w-full max-w-xs"
                   >
                     Create Photo Strip
                   </button>

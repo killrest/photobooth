@@ -15,17 +15,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KacaKacaBooth - 免费在线照相亭 | Free Online Photobooth",
-  description: "KacaKacaBooth是一个免费的在线照相亭，可以拍摄四连拍照片，添加滤镜、边框和贴纸，一键导出分享。Free online photobooth to take 4 consecutive photos with filters, frames and stickers.",
+  title: "Free PhotoBooth | Free Online Photo Strip Creator",
+  description: "Turn your home into a free photobooth with exclusive templates, trendy filters, and fun stickers—beautiful results every time",
   keywords: ["photobooth", "free photobooth", "online photobooth", "照相亭", "在线照相亭", "免费照相亭"],
-  authors: [{ name: "KacaKacaBooth Team" }],
+  authors: [{ name: "Free PhotoBooth Team" }],
+  icons: {
+    icon: '/icon.jpg',
+    shortcut: '/icon.jpg',
+    apple: '/icon.jpg',
+  },
   openGraph: {
-    title: "KacaKacaBooth - 免费在线照相亭 | Free Online Photobooth",
-    description: "拍摄四连拍照片，添加滤镜、边框和贴纸，一键导出分享。Take 4 consecutive photos, add filters, frames and stickers.",
-    url: "https://kacakacabooth.com",
-    siteName: "KacaKacaBooth",
+    title: "Free PhotoBooth | Free Online Photo Strip Creator",
+    description: "Turn your home into a free photobooth with exclusive templates, trendy filters, and fun stickers—beautiful results every time",
+    url: "https://freephotobooth.app",
+    siteName: "Free PhotoBooth",
     locale: "zh_CN",
     type: "website",
+    images: [
+      {
+        url: '/icon.jpg',
+        width: 400,
+        height: 400,
+        alt: 'Free PhotoBooth Logo',
+      }
+    ],
   },
 };
 

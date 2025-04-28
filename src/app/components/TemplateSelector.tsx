@@ -16,15 +16,15 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
 }) => {
   return (
     <div className="mb-6">
-      <h3 className="text-md font-semibold mb-3 text-pink-600">Select Template</h3>
+      <h3 className="text-md font-semibold mb-3 text-amber-700">Select Template</h3>
       <div className="flex flex-wrap gap-2">
         {templates.map((template) => (
           <button
             key={template.id}
             className={`px-4 py-2 rounded-full transition-all ${
               selectedTemplateId === template.id
-                ? 'bg-pink-500 text-white shadow-md'
-                : 'bg-white border border-gray-300 text-gray-700 hover:bg-pink-50 hover:border-pink-300'
+                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md hover:from-amber-600 hover:to-amber-700'
+                : 'bg-white border border-gray-300 text-gray-700 hover:bg-cream-50 hover:border-amber-300 hover:text-amber-700'
             }`}
             onClick={() => onSelectTemplate(template.id)}
             title={template.description}
@@ -33,13 +33,6 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
           </button>
         ))}
       </div>
-      
-      {/* Display description of currently selected template */}
-      {selectedTemplateId && (
-        <div className="mt-3 text-sm text-gray-600 bg-white p-2 rounded-md border border-gray-200">
-          <p>{templates.find(t => t.id === selectedTemplateId)?.description || ''}</p>
-        </div>
-      )}
     </div>
   );
 };

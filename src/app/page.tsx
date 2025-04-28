@@ -11,7 +11,7 @@ export default function Home() {
       {/* Main content */}
       <div>
         {/* Hero section - Pink tone style with vertical layout */}
-        <section className="bg-gradient-to-b from-pink-50 to-purple-100 py-16">
+        <section className="bg-gradient-to-b from-cream-50 to-cream-100 py-16">
           <div className="container mx-auto px-6 md:px-12 lg:px-20">
             <div className="flex flex-col items-center">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-gray-800 mb-4">
@@ -24,7 +24,7 @@ export default function Home() {
               <div className="flex flex-col items-center justify-center">
                 <div className="mb-10 w-full max-w-2xl">
                   <Image 
-                    src="/photobooth-example.jpg" 
+                    src="/Headphoto.jpg" 
                     alt="KacaKacaBooth Online Photo Booth" 
                     width={1080} 
                     height={720}
@@ -35,7 +35,7 @@ export default function Home() {
                 
                 <Link 
                   href="/photo"
-                  className="flex items-center justify-center gap-2 px-10 py-5 bg-pink-600 text-white font-semibold text-lg rounded-full hover:bg-pink-700 transition shadow-lg w-64"
+                  className="flex items-center justify-center gap-2 px-10 py-5 bg-amber-600 text-white font-semibold text-lg rounded-full hover:bg-amber-700 transition shadow-lg w-64"
                 >
                   <FaCamera className="mr-1" />
                   Start
@@ -51,7 +51,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row gap-12 mb-16 items-center">
               <div className="md:w-1/2">
                 <Image 
-                  src="/photobooth-example.jpg" 
+                  src="/photo1.jpg" 
                   alt="KacaKacaBooth Online Photo Booth" 
                   width={560} 
                   height={400}
@@ -67,7 +67,7 @@ export default function Home() {
                 </p>
                 <Link 
                   href="/photo"
-                  className="px-10 py-3 bg-pink-600 text-white font-semibold rounded-full hover:bg-pink-700 transition"
+                  className="px-10 py-3 bg-amber-600 text-white font-semibold rounded-full hover:bg-amber-700 transition"
                 >
                   Try Now
                 </Link>
@@ -77,7 +77,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row-reverse gap-12 mb-16 items-center">
               <div className="md:w-1/2">
                 <Image 
-                  src="/photobooth-example.jpg" 
+                  src="/photo2.jpg" 
                   alt="KacaKacaBooth Online Photo Booth" 
                   width={560} 
                   height={400}
@@ -93,7 +93,7 @@ export default function Home() {
                 </p>
                 <Link 
                   href="/photo"
-                  className="px-10 py-3 bg-pink-600 text-white font-semibold rounded-full hover:bg-pink-700 transition"
+                  className="px-10 py-3 bg-amber-600 text-white font-semibold rounded-full hover:bg-amber-700 transition"
                 >
                   Try Now
                 </Link>
@@ -103,7 +103,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row gap-12 mb-16 items-center">
               <div className="md:w-1/2">
                 <Image 
-                  src="/photobooth-example.jpg" 
+                  src="/photo3.jpg" 
                   alt="KacaKacaBooth Online Photo Booth" 
                   width={560} 
                   height={400}
@@ -119,7 +119,7 @@ export default function Home() {
                 </p>
                 <Link 
                   href="/photo"
-                  className="px-10 py-3 bg-pink-600 text-white font-semibold rounded-full hover:bg-pink-700 transition"
+                  className="px-10 py-3 bg-amber-600 text-white font-semibold rounded-full hover:bg-amber-700 transition"
                 >
                   Try Now
                 </Link>
@@ -129,50 +129,51 @@ export default function Home() {
         </section>
 
         {/* How to use section - Moved to be between features and reviews */}
-        <section className="py-16 bg-pink-50">
+        {/* 
+        <section className="py-16 bg-cream-50">
           <div className="container mx-auto px-6 md:px-12 lg:px-20">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">
               How to Get?
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-white p-5 rounded-3xl border border-pink-200">
+              <div className="bg-white p-5 rounded-3xl border border-cream-200">
                 <Image 
                   src="/photobooth-example.jpg" 
                   alt="Take 4 Pictures" 
                   width={400} 
                   height={300}
-                  className="w-full h-auto rounded-2xl mb-5 border border-pink-100" 
+                  className="w-full h-auto rounded-2xl mb-5 border border-cream-100" 
                 />
-                <h3 className="text-xl font-medium text-pink-600 mb-2">Take 4 Pictures</h3>
+                <h3 className="text-xl font-medium text-amber-700 mb-2">Take 4 Pictures</h3>
                 <p className="text-gray-700">
                   Choose a filter, then hit Start to capture four quick shots in a row—fast, fun, and completely free.
                 </p>
               </div>
               
-              <div className="bg-white p-5 rounded-3xl border border-pink-200">
+              <div className="bg-white p-5 rounded-3xl border border-cream-200">
                 <Image 
                   src="/photobooth-example.jpg" 
                   alt="Apply Stickers and Frames" 
                   width={400} 
                   height={300}
-                  className="w-full h-auto rounded-2xl mb-5 border border-pink-100" 
+                  className="w-full h-auto rounded-2xl mb-5 border border-cream-100" 
                 />
-                <h3 className="text-xl font-medium text-pink-600 mb-2">Enhance with  Filters & Frames</h3>
+                <h3 className="text-xl font-medium text-amber-700 mb-2">Enhance with  Filters & Frames</h3>
                 <p className="text-gray-700">
                   After shooting, customize your strip by applying stylish filters and playful stickers—make every frame uniquely yours.
                 </p>
               </div>
               
-              <div className="bg-white p-5 rounded-3xl border border-pink-200">
+              <div className="bg-white p-5 rounded-3xl border border-cream-200">
                 <Image 
                   src="/photobooth-example.jpg" 
                   alt="Download" 
                   width={400} 
                   height={300}
-                  className="w-full h-auto rounded-2xl mb-5 border border-pink-100" 
+                  className="w-full h-auto rounded-2xl mb-5 border border-cream-100" 
                 />
-                <h3 className="text-xl font-medium text-pink-600 mb-2">Download & Share</h3>
+                <h3 className="text-xl font-medium text-amber-700 mb-2">Download & Share</h3>
                 <p className="text-gray-700">
                   When you're happy with your design, click Download to save your Photo Booth strip. Instantly share on social media or with friends!
                 </p>
@@ -180,6 +181,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        */}
 
         {/* User reviews section */}
         <section className="py-16 bg-white">
@@ -189,7 +191,7 @@ export default function Home() {
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-pink-50 p-8 rounded-2xl">
+              <div className="bg-cream-50 p-8 rounded-2xl">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">Lily T.</h3>
@@ -199,7 +201,7 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  <div className="text-pink-500 text-3xl">
+                  <div className="text-amber-500 text-3xl">
                     <FaQuoteRight />
                   </div>
                 </div>
@@ -208,7 +210,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="bg-pink-50 p-8 rounded-2xl">
+              <div className="bg-cream-50 p-8 rounded-2xl">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">Jason M.</h3>
@@ -218,7 +220,7 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  <div className="text-pink-500 text-3xl">
+                  <div className="text-amber-500 text-3xl">
                     <FaQuoteRight />
                   </div>
                 </div>
@@ -227,7 +229,7 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="bg-pink-50 p-8 rounded-2xl">
+              <div className="bg-cream-50 p-8 rounded-2xl">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-2xl font-bold text-gray-800 mb-2">Emily S.</h3>
@@ -237,7 +239,7 @@ export default function Home() {
                       ))}
                     </div>
                   </div>
-                  <div className="text-pink-500 text-3xl">
+                  <div className="text-amber-500 text-3xl">
                     <FaQuoteRight />
                   </div>
                 </div>
@@ -250,17 +252,17 @@ export default function Home() {
         </section>
 
         {/* FAQs Section */}
-        <section className="py-16 bg-pink-50">
+        <section className="py-16 bg-cream-50">
           <div className="container mx-auto px-6 md:px-12 lg:px-20">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-12">
               F&Q
             </h2>
             
             <div className="max-w-4xl mx-auto">
-              <div className="border-b border-pink-200 py-5">
+              <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">What is our Online Photo Booth?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-gray-800 flex items-center justify-center bg-gray-800 text-pink-400">
+                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
                     <span className="text-lg font-bold rotate-45">+</span>
                   </div>
                 </div>
@@ -269,10 +271,10 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="border-b border-pink-200 py-5">
+              <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">How much does it cost?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-gray-800 flex items-center justify-center bg-gray-800 text-pink-400">
+                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
                     <span className="text-lg font-bold rotate-45">+</span>
                   </div>
                 </div>
@@ -281,10 +283,10 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="border-b border-pink-200 py-5">
+              <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">Do I need to create an account?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-gray-800 flex items-center justify-center bg-gray-800 text-pink-400">
+                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
                     <span className="text-lg font-bold rotate-45">+</span>
                   </div>
                 </div>
@@ -293,10 +295,10 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="border-b border-pink-200 py-5">
+              <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">Can I customize my photo strips?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-gray-800 flex items-center justify-center bg-gray-800 text-pink-400">
+                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
                     <span className="text-lg font-bold rotate-45">+</span>
                   </div>
                 </div>
@@ -305,10 +307,10 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="border-b border-pink-200 py-5">
+              <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">Which devices are supported?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-gray-800 flex items-center justify-center bg-gray-800 text-pink-400">
+                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
                     <span className="text-lg font-bold rotate-45">+</span>
                   </div>
                 </div>
@@ -317,10 +319,10 @@ export default function Home() {
                 </p>
               </div>
               
-              <div className="border-b border-pink-200 py-5">
+              <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">Is the photo quality as good as offline booths?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-gray-800 flex items-center justify-center bg-gray-800 text-pink-400">
+                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
                     <span className="text-lg font-bold rotate-45">+</span>
                   </div>
                 </div>
@@ -341,23 +343,15 @@ export default function Home() {
             <p className="text-xl text-gray-600 mb-10">
               Ready to capture your life moments and share your creations? Try KacaKacaBooth's online photo booth now! Take Life4Cuts photos, add vintage filters, and create unique photo strips.
             </p>
-            
-            <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Link 
                 href="/photo"
-                className="px-10 py-5 bg-gray-800 text-white font-semibold text-xl rounded-full hover:bg-gray-900 transition"
+                className="px-10 py-5 bg-amber-600 text-white font-semibold text-xl rounded-full hover:bg-amber-700 transition"
               >
                 Try Now
               </Link>
-              
-              <Link 
-                href="/photo"
-                className="px-10 py-5 bg-pink-600 text-white font-semibold text-xl rounded-full hover:bg-pink-700 transition"
-              >
-                Download App
-              </Link>
             </div>
-          </div>
+            </div>
         </section>
       </div>
     </Layout>
