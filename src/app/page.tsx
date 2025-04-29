@@ -15,7 +15,7 @@ export default function Home() {
           <div className="container mx-auto px-6 md:px-12 lg:px-20">
             <div className="flex flex-col items-center">
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center text-gray-800 mb-4">
-                Free Photo Booth | Free Online Photo Strip Creator
+                Yoyobooth | Free Online Photo Strip Creator
               </h1>
               <p className="text-base md:text-lg text-center text-gray-600 mb-10 max-w-3xl mx-auto">
                 Turn your home into a free photobooth with exclusive templates, trendy filters, and fun stickers—beautiful results every time

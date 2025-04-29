@@ -37,15 +37,15 @@ const templates: Template[] = [
     photoPositions: [
       // Default template doesn't use positions as it's just a vertical stack
     ],
-    aspectRatio: 0.25, // 1:4 aspect ratio
+    aspectRatio: 0.67, // 3:2 aspect ratio
   },
   // 模板1: Summer
   {
     id: 't1',
     name: 'template 1',
-    imagePath: '/templates/1.png', // 背景图片
+    imagePath: '/templates/1.png', // 修正背景图片路径
     // 使用已有的图片作为叠加图片，这里我们使用相同的背景图片但将其作为叠加层
-    // templateImagePath: '/templates/1-overlay.png', 
+    templateImagePath: '/templates/1.png', 
     overlayPath: '',
     backgroundColor: '#000033', // Deep blue background (fallback if image fails to load)
     description: 'Four-photo starry sky layout with vertical arrangement',
@@ -69,7 +69,7 @@ const templates: Template[] = [
     id: 't2',
     name: 'template 2',
     imagePath: '/templates/2.png', // 背景图片
-    // templateImagePath: '/templates/2-overlay.png', 
+    templateImagePath: '/templates/2.png', // 添加模板图片路径
     overlayPath: '',
     backgroundColor: '#f5f5f5', // Light gray background (fallback if image fails to load)
     description: 'Elegant template with customizable rounded corners for modern look',

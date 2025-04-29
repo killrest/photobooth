@@ -28,12 +28,12 @@ const CaptureState = {
 
 const PhotoPage = () => {
   const router = useRouter();
-  const { setPhotos } = usePhotoContext();
+  const { setPhotos, setSelectedFilter } = usePhotoContext();
   const webcamRef = useRef<Webcam>(null);
   
   // State management
   const [captureState, setCaptureState] = useState(CaptureState.SELECTING_FILTER);
-  const [selectedFilter, setSelectedFilter] = useState('normal');
+  const [selectedFilter, setSelectedFilterState] = useState('normal');
   const [capturedPhotos, setCapturedPhotos] = useState<(string | null)[]>([null, null, null, null]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -43,7 +43,7 @@ const PhotoPage = () => {
 
   // Select filter
   const handleFilterSelect = (filterId: string) => {
-    setSelectedFilter(filterId);
+    setSelectedFilterState(filterId);
   };
 
   // Start capture process
@@ -138,9 +138,13 @@ const PhotoPage = () => {
       // Remove potential null values, although there shouldn't be any based on the logic
       const validPhotos = capturedPhotos.filter(photo => photo !== null) as string[];
       setPhotos(validPhotos);
+      // Save the selected filter when proceeding to results
+      setSelectedFilter(selectedFilter);
       router.push('/result');
     } else if (uploadedPhotos.length === 4) {
       setPhotos(uploadedPhotos);
+      // Save the selected filter when proceeding to results
+      setSelectedFilter(selectedFilter);
       router.push('/result');
     }
   };

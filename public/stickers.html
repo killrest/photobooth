@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Sticker Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .sticker-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .sticker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .emoji {
+            font-size: 80px;
+            background-color: transparent;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sticker Generator</h1>
+    
+    <div class="sticker-container">
+        <div class="sticker">
+            <div class="emoji" id="heart">❤️</div>
+            <canvas id="heartCanvas" width="200" height="200"></canvas>
+            <button onclick="downloadSticker('heartCanvas', 'heart')">Download Heart</button>
+        </div>
+        <div class="sticker">
+            <div class="emoji" id="star">⭐</div>
+            <canvas id="starCanvas" width="200" height="200"></canvas>
+            <button onclick="downloadSticker('starCanvas', 'star')">Download Star</button>
+        </div>
+        <div class="sticker">
+            <div class="emoji" id="smile">😊</div>
+            <canvas id="smileCanvas" width="200" height="200"></canvas>
+            <button onclick="downloadSticker('smileCanvas', 'smile')">Download Smile</button>
+        </div>
+        <div class="sticker">
+            <div class="emoji" id="flower">🌸</div>
+            <canvas id="flowerCanvas" width="200" height="200"></canvas>
+            <button onclick="downloadSticker('flowerCanvas', 'flower')">Download Flower</button>
+        </div>
+        <div class="sticker">
+            <div class="emoji" id="crown">👑</div>
+            <canvas id="crownCanvas" width="200" height="200"></canvas>
+            <button onclick="downloadSticker('crownCanvas', 'crown')">Download Crown</button>
+        </div>
+        <div class="sticker">
+            <div class="emoji" id="ribbon">🎀</div>
+            <canvas id="ribbonCanvas" width="200" height="200"></canvas>
+            <button onclick="downloadSticker('ribbonCanvas', 'ribbon')">Download Ribbon</button>
+        </div>
+        <div class="sticker">
+            <div class="emoji" id="cloud">☁️</div>
+            <canvas id="cloudCanvas" width="200" height="200"></canvas>
+            <button onclick="downloadSticker('cloudCanvas', 'cloud')">Download Cloud</button>
+        </div>
+        <div class="sticker">
+            <div class="emoji" id="balloon">🎈</div>
+            <canvas id="balloonCanvas" width="200" height="200"></canvas>
+            <button onclick="downloadSticker('balloonCanvas', 'balloon')">Download Balloon</button>
+        </div>
+    </div>
+
+    <button onclick="generateAllStickers()">Generate All Stickers</button>
+    <button onclick="downloadAllStickers()">Download All Stickers</button>
+
+    <script>
+        // Function to draw emoji on canvas
+        function drawEmojiOnCanvas(emojiId, canvasId) {
+            const emoji = document.getElementById(emojiId).textContent;
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw emoji centered
+            ctx.font = '150px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(emoji, canvas.width / 2, canvas.height / 2);
+        }
+
+        // Download individual sticker
+        function downloadSticker(canvasId, fileName) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = `${fileName}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Generate all stickers
+        function generateAllStickers() {
+            const stickers = [
+                {emoji: 'heart', canvas: 'heartCanvas'},
+                {emoji: 'star', canvas: 'starCanvas'},
+                {emoji: 'smile', canvas: 'smileCanvas'},
+                {emoji: 'flower', canvas: 'flowerCanvas'},
+                {emoji: 'crown', canvas: 'crownCanvas'},
+                {emoji: 'ribbon', canvas: 'ribbonCanvas'},
+                {emoji: 'cloud', canvas: 'cloudCanvas'},
+                {emoji: 'balloon', canvas: 'balloonCanvas'}
+            ];
+            
+            stickers.forEach(sticker => {
+                drawEmojiOnCanvas(sticker.emoji, sticker.canvas);
+            });
+        }
+
+        // Download all stickers at once
+        function downloadAllStickers() {
+            const stickers = [
+                {canvas: 'heartCanvas', name: 'heart'},
+                {canvas: 'starCanvas', name: 'star'},
+                {canvas: 'smileCanvas', name: 'smile'},
+                {canvas: 'flowerCanvas', name: 'flower'},
+                {canvas: 'crownCanvas', name: 'crown'},
+                {canvas: 'ribbonCanvas', name: 'ribbon'},
+                {canvas: 'cloudCanvas', name: 'cloud'},
+                {canvas: 'balloonCanvas', name: 'balloon'}
+            ];
+            
+            stickers.forEach((sticker, index) => {
+                setTimeout(() => {
+                    downloadSticker(sticker.canvas, sticker.name);
+                }, index * 300); // Add a delay to prevent browser blocking
+            });
+        }
+
+        // Generate stickers when page loads
+        window.onload = generateAllStickers;
+    </script>
+</body>
+</html> 

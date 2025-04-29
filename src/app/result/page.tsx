@@ -31,101 +31,84 @@ const frameColors = [
   { id: 'none', color: 'transparent', name: 'No Frame' },
 ];
 
-// Built-in sticker SVG data
-const stickers = [
-  { id: 'none', name: 'No Stickers', icon: '∅' },
-  { id: 'heart', name: 'Heart', icon: '❤️' },
-  { id: 'star', name: 'Star', icon: '⭐' },
-  { id: 'rainbow', name: 'Rainbow', icon: '🌈' },
-  { id: 'sparkle', name: 'Sparkle', icon: '✨' },
-  { id: 'butterfly', name: 'Butterfly', icon: '🦋' },
-  { id: 'cat', name: 'Cat', icon: '🐱' },
-  { id: 'dog', name: 'Dog', icon: '🐶' },
-  { id: 'flower', name: 'Flower', icon: '🌸' },
-  { id: 'heart_eyes', name: 'Heart Eyes', icon: '😍' },
-  { id: 'sunglasses', name: 'Sunglasses', icon: '😎' },
-  { id: 'crown', name: 'Crown', icon: '👑' },
-  { id: 'fire', name: 'Fire', icon: '🔥' },
-  { id: 'balloon', name: 'Balloon', icon: '🎈' },
-  { id: 'camera', name: 'Camera', icon: '📷' },
-  { id: 'lips', name: 'Lips', icon: '💋' },
-  { id: 'unicorn', name: 'Unicorn', icon: '🦄' },
-  { id: 'cloud', name: 'Cloud', icon: '☁️' },
+// Filter options to match those in the photo page
+const filterOptions = [
+  { id: 'normal', name: 'Default', style: '' },
+  { id: 'bw', name: 'B&W', style: 'grayscale(100%)' },
+  { id: 'vintage', name: 'Vintage', style: 'sepia(80%)' },
+  { id: 'oldPhoto', name: 'Old Photo', style: 'sepia(50%) contrast(120%)' },
+  { id: 'amber', name: 'Amber', style: 'sepia(80%) hue-rotate(-20deg)' },
+  { id: 'nocturne', name: 'Night', style: 'brightness(0.8) contrast(120%) saturate(1.2) hue-rotate(180deg)' },
 ];
 
-// Create stickers map for easier lookup
-const stickersMap = stickers.reduce((acc, sticker) => {
-  acc[sticker.id] = sticker.icon;
-  return acc;
-}, {} as Record<string, string>);
+// 贴纸选项
+const stickerOptions = [
+  { id: 'heart', src: '/stickers/heart.png', name: 'Heart' },
+  { id: 'star', src: '/stickers/star.png', name: 'Star' },
+  { id: 'smile', src: '/stickers/smile.png', name: 'Smile' },
+  { id: 'flower', src: '/stickers/flower.png', name: 'Flower' },
+  { id: 'crown', src: '/stickers/crown.png', name: 'Crown' },
+  { id: 'ribbon', src: '/stickers/ribbon.png', name: 'Ribbon' },
+  { id: 'cloud', src: '/stickers/cloud.png', name: 'Cloud' },
+  { id: 'balloon', src: '/stickers/balloon.png', name: 'Balloon' },
+];
 
-// 生成随机位置函数 - 增强版
-const getRandomPosition = () => {
-  // 给边缘留出一些空间，所以范围是20-80%而不是0-100%
-  return {
-    x: Math.floor(Math.random() * 60) + 20, 
-    y: Math.floor(Math.random() * 60) + 20
-  };
-};
+// 贴纸映射对象
+const stickersMap: {[key: string]: string} = {};
+stickerOptions.forEach(sticker => {
+  stickersMap[sticker.id] = sticker.src;
+});
 
-// 生成美观均衡的多贴纸位置
-const generateBalancedPositions = (numStickers: number): {x: number, y: number}[] => {
-  const positions: {x: number, y: number}[] = [];
-  
-  // 如果只有1-2个贴纸，就随机分布
-  if (numStickers <= 2) {
-    for (let i = 0; i < numStickers; i++) {
-      positions.push(getRandomPosition());
-    }
-    return positions;
-  }
-  
-  // 对于多个贴纸，我们创建更均衡的分布
-  // 将照片区域分为最多9个区域，确保每个区域至多有一个贴纸
-  
-  // 创建区域划分
-  const areas = [
-    { xRange: [10, 30], yRange: [10, 30] },  // 左上
-    { xRange: [40, 60], yRange: [10, 30] },  // 中上
-    { xRange: [70, 90], yRange: [10, 30] },  // 右上
-    { xRange: [10, 30], yRange: [40, 60] },  // 左中
-    { xRange: [40, 60], yRange: [40, 60] },  // 中心
-    { xRange: [70, 90], yRange: [40, 60] },  // 右中
-    { xRange: [10, 30], yRange: [70, 90] },  // 左下
-    { xRange: [40, 60], yRange: [70, 90] },  // 中下
-    { xRange: [70, 90], yRange: [70, 90] },  // 右下
-  ];
-  
-  // 随机选择区域，不重复
-  const selectedAreaIndices = new Set<number>();
-  while (selectedAreaIndices.size < Math.min(numStickers, areas.length)) {
-    const randomIndex = Math.floor(Math.random() * areas.length);
-    selectedAreaIndices.add(randomIndex);
-  }
-  
-  // 在每个选中的区域内随机生成一个位置
-  Array.from(selectedAreaIndices).forEach(index => {
-    const area = areas[index];
-    const x = Math.floor(Math.random() * (area.xRange[1] - area.xRange[0])) + area.xRange[0];
-    const y = Math.floor(Math.random() * (area.yRange[1] - area.yRange[0])) + area.yRange[0];
-    positions.push({ x, y });
-  });
-  
-  return positions;
-};
-
-// 生成随机大小 (缩放比例)
-const getRandomScale = (): number => {
-  // 0.8 到 1.2 之间的随机比例
-  return 0.8 + Math.random() * 0.4;
-};
-
-// 定义操作历史类型
+// 定义历史记录的操作类型
 type HistoryAction = {
-  type: 'add' | 'remove' | 'removeSingle';  // 操作类型：添加或删除或单个删除
-  stickers: {id: string, x: number, y: number, scale: number}[];  // 相关贴纸
-  index?: number;  // 删除操作的索引
+  type: 'sticker_add' | 'sticker_update' | 'sticker_delete' | 'template_change' | 'color_change';
+  data: any;
+  previousData?: any;
 };
+
+interface HistoryButtonProps {
+  onClick: () => void;
+  disabled: boolean;
+  children: React.ReactNode;
+  title: string;
+}
+
+// 历史记录按钮组件
+const HistoryButton = ({ onClick, disabled, children, title }: HistoryButtonProps) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    title={title}
+    className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+      disabled 
+        ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+        : 'bg-amber-600 text-white hover:bg-amber-700 shadow-sm'
+    }`}
+  >
+    {children}
+  </button>
+);
+
+// 历史记录
+const addHistoryAction = (
+  history: HistoryAction[], 
+  historyIndex: number,
+  action: HistoryAction
+): [HistoryAction[], number] => {
+  // 如果我们在历史记录中间做了新的更改，需要删除后面的历史记录
+  const newHistory = history.slice(0, historyIndex + 1);
+  return [
+    [...newHistory, action],
+    newHistory.length // 新的历史索引
+  ];
+};
+
+// 小节标题组件
+const SectionTitle = ({ title }: { title: string }) => (
+  <h3 className="text-md font-semibold mb-2 text-gray-800 border-b border-gray-200 pb-1">
+    {title}
+  </h3>
+);
 
 const ResultPage = () => {
   const router = useRouter();
@@ -183,27 +166,98 @@ const ResultPage = () => {
     // Switch to the default template when a color is selected
     setSelectedTemplateId('default');
   };
+  
+  // Get filter style based on the selected filter
+  const getFilterStyle = () => {
+    const filter = filterOptions.find(f => f.id === photoData.selectedFilter);
+    return filter?.style || '';
+  };
 
-  // 选择贴纸数量范围 - 根据贴纸类型决定
-  const getStickerCountRange = (stickerId: string): [number, number] => {
-    // 针对不同贴纸类型，设定不同的数量范围
-    switch(stickerId) {
-      case 'heart':
-      case 'star':
-      case 'sparkle':
-        return [3, 5]; // 这些小贴纸可以多放几个
-      case 'butterfly':
-      case 'flower':
-        return [2, 4]; // 这些中等贴纸适量放置
-      case 'rainbow':
-      case 'cat':
-      case 'dog':
-      case 'crown':
-      case 'unicorn':
-        return [1, 2]; // 这些大贴纸或主体贴纸少放
-      default:
-        return [1, 3]; // 默认范围
+  // Get the border color for the frame
+  const getBorderColor = () => {
+    const color = frameColors.find(c => c.id === selectedColor)?.color;
+    
+    if (selectedColor === 'none') {
+      return { border: 'none' };
     }
+    
+    if (selectedColor === 'rainbow') {
+      return {
+        borderWidth: '10px',
+        borderStyle: 'solid',
+        borderImage: `${color} 1`,
+        borderRadius: '0.5rem',
+        // 由于彩虹边框是一个渐变，我们使用淡色作为背景色
+        backgroundColor: '#f8f9fa'
+      };
+    }
+    
+    return {
+      border: `10px solid ${color}`,
+      borderRadius: '0.5rem',
+      backgroundColor: color // 添加背景色与边框同色
+    };
+  };
+
+  // 生成随机位置函数 - 增强版
+  const getRandomPosition = () => {
+    // 给边缘留出一些空间，所以范围是20-80%而不是0-100%
+    return {
+      x: Math.floor(Math.random() * 60) + 20, 
+      y: Math.floor(Math.random() * 60) + 20
+    };
+  };
+
+  // 生成美观均衡的多贴纸位置
+  const generateBalancedPositions = (numStickers: number): {x: number, y: number}[] => {
+    const positions: {x: number, y: number}[] = [];
+    
+    // 如果只有1-2个贴纸，就随机分布
+    if (numStickers <= 2) {
+      for (let i = 0; i < numStickers; i++) {
+        positions.push(getRandomPosition());
+      }
+      return positions;
+    }
+    
+    // 对于多个贴纸，我们创建更均衡的分布
+    // 将照片区域分为最多9个区域，确保每个区域至多有一个贴纸
+    
+    // 创建区域划分
+    const areas = [
+      { xRange: [10, 30], yRange: [10, 30] },  // 左上
+      { xRange: [40, 60], yRange: [10, 30] },  // 中上
+      { xRange: [70, 90], yRange: [10, 30] },  // 右上
+      { xRange: [10, 30], yRange: [40, 60] },  // 左中
+      { xRange: [40, 60], yRange: [40, 60] },  // 中心
+      { xRange: [70, 90], yRange: [40, 60] },  // 右中
+      { xRange: [10, 30], yRange: [70, 90] },  // 左下
+      { xRange: [40, 60], yRange: [70, 90] },  // 中下
+      { xRange: [70, 90], yRange: [70, 90] },  // 右下
+    ];
+    
+    // 随机选择区域，不重复
+    const selectedAreaIndices = new Set<number>();
+    while (selectedAreaIndices.size < Math.min(numStickers, areas.length)) {
+      const randomIndex = Math.floor(Math.random() * areas.length);
+      selectedAreaIndices.add(randomIndex);
+    }
+    
+    // 在每个选中的区域内随机生成一个位置
+    Array.from(selectedAreaIndices).forEach(index => {
+      const area = areas[index];
+      const x = Math.floor(Math.random() * (area.xRange[1] - area.xRange[0])) + area.xRange[0];
+      const y = Math.floor(Math.random() * (area.yRange[1] - area.yRange[0])) + area.yRange[0];
+      positions.push({ x, y });
+    });
+    
+    return positions;
+  };
+
+  // 生成随机大小 (缩放比例)
+  const getRandomScale = (): number => {
+    // 0.8 到 1.2 之间的随机比例
+    return 0.8 + Math.random() * 0.4;
   };
 
   // 增强版贴纸添加功能 - 添加多个贴纸
@@ -233,8 +287,8 @@ const ResultPage = () => {
     
     // 记录添加操作到历史
     const newAction: HistoryAction = {
-      type: 'add',
-      stickers: newStickers
+      type: 'sticker_add',
+      data: newStickers
     };
     
     // 如果已经撤销过操作，需要清除那些被撤销的操作历史
@@ -255,9 +309,8 @@ const ResultPage = () => {
     
     // 记录删除操作到历史
     const newAction: HistoryAction = {
-      type: 'removeSingle',
-      stickers: [deletedSticker],
-      index: index
+      type: 'sticker_delete',
+      data: deletedSticker
     };
     
     // 如果已经撤销过操作，需要清除那些被撤销的操作历史
@@ -272,14 +325,14 @@ const ResultPage = () => {
     
     const actionToUndo = history[historyIndex];
     
-    if (actionToUndo.type === 'add') {
+    if (actionToUndo.type === 'sticker_add') {
       // 撤销添加操作：移除添加的贴纸
-      const stickerCount = actionToUndo.stickers.length;
+      const stickerCount = actionToUndo.data.length;
       setSelectedStickers(prevStickers => prevStickers.slice(0, -stickerCount));
-    } else if (actionToUndo.type === 'remove' || actionToUndo.type === 'removeSingle') {
+    } else if (actionToUndo.type === 'sticker_delete') {
       // 撤销删除操作：恢复删除的贴纸
-      const stickerToRestore = actionToUndo.stickers[0];
-      const insertIndex = actionToUndo.index !== undefined ? actionToUndo.index : selectedStickers.length;
+      const stickerToRestore = actionToUndo.data;
+      const insertIndex = selectedStickers.length;
       
       const newStickers = [...selectedStickers];
       newStickers.splice(insertIndex, 0, stickerToRestore);
@@ -296,12 +349,12 @@ const ResultPage = () => {
     
     const actionToRedo = history[historyIndex + 1];
     
-    if (actionToRedo.type === 'add') {
+    if (actionToRedo.type === 'sticker_add') {
       // 重做添加操作：重新添加贴纸
-      setSelectedStickers(prevStickers => [...prevStickers, ...actionToRedo.stickers]);
-    } else if (actionToRedo.type === 'remove' || actionToRedo.type === 'removeSingle') {
+      setSelectedStickers(prevStickers => [...prevStickers, ...actionToRedo.data]);
+    } else if (actionToRedo.type === 'sticker_delete') {
       // 重做删除操作：再次删除贴纸
-      const index = actionToRedo.index !== undefined ? actionToRedo.index : -1;
+      const index = selectedStickers.findIndex(s => s.id === actionToRedo.data.id);
       if (index >= 0) {
         const newStickers = [...selectedStickers];
         newStickers.splice(index, 1);
@@ -416,24 +469,20 @@ const ResultPage = () => {
     router.push('/photo');
   };
 
-  // 获取边框颜色样式
-  const getBorderColor = () => {
-    const colorOption = frameColors.find(c => c.id === selectedColor);
-    if (!colorOption) return 'none';
-    
-    // 返回适合React style对象的格式
-    if (colorOption.color === 'transparent') {
-      return 'none';
-    } else if (colorOption.id === 'rainbow') {
-      // 不返回字符串，而是返回对象
-      return {
-        border: '5px solid transparent',
-        backgroundImage: colorOption.color,
-        backgroundOrigin: 'border-box',
-        backgroundClip: 'padding-box, border-box'
-      };
-    } else {
-      return `5px solid ${colorOption.color}`;
+  // 选择贴纸数量范围 - 根据贴纸类型决定
+  const getStickerCountRange = (stickerId: string): [number, number] => {
+    // 针对不同贴纸类型，设定不同的数量范围
+    switch(stickerId) {
+      case 'heart':
+      case 'star':
+      case 'smile':
+        return [3, 5]; // 这些小贴纸可以多放几个
+      case 'flower':
+        return [2, 4]; // 这些中等贴纸适量放置
+      case 'crown':
+        return [1, 2]; // 这些大贴纸或主体贴纸少放
+      default:
+        return [1, 3]; // 默认范围
     }
   };
 
@@ -459,10 +508,10 @@ const ResultPage = () => {
                 photos={photoData?.photos || []}
                 selectedStickers={selectedStickers}
                 stickersMap={stickersMap}
-                borderColor={getBorderColor() as string}
-                borderStyle={typeof getBorderColor() === 'object' ? getBorderColor() as React.CSSProperties : undefined}
+                borderStyle={getBorderColor() as React.CSSProperties}
                 onStickerMouseDown={handleTemplateMouseDown}
                 onStickerDelete={handleDeleteSticker}
+                filterStyle={getFilterStyle()}
               />
             </div>
             
@@ -473,10 +522,10 @@ const ResultPage = () => {
                 <div className="mb-6">
                   <h3 className="text-md font-semibold mb-3 text-amber-700">Frame Color</h3>
                   <div className="grid grid-cols-8 gap-2">
-                    {frameColors.slice(0, 16).map((color) => (
+                    {frameColors.filter(color => color.id !== 'none' && color.id !== 'rainbow').map((color) => (
                       <button
                         key={color.id}
-                        className={`w-9 h-9 rounded-full ${selectedColor === color.id ? 'ring-2 ring-amber-500 ring-offset-2' : ''} transition-all`}
+                        className={`w-9 h-9 rounded-full shadow-md border border-gray-200 ${selectedColor === color.id ? 'ring-2 ring-amber-500 ring-offset-2' : 'hover:shadow-lg'} transition-all`}
                         style={{ 
                           background: color.color === 'transparent' 
                             ? '#f3f4f6' 
@@ -511,14 +560,21 @@ const ResultPage = () => {
                   </div>
                   
                   <div className="grid grid-cols-7 gap-2">
-                    {stickers.filter(s => s.id !== 'none').map((sticker) => (
+                    {stickerOptions.map((sticker) => (
                       <button
                         key={sticker.id}
                         className="aspect-square bg-white rounded-md flex items-center justify-center hover:bg-gray-100 p-1 text-xl shadow-sm hover:shadow-md transition-all"
                         onClick={() => handleAddSticker(sticker.id)}
                         title={`Add ${sticker.name} stickers`}
                       >
-                        <span>{sticker.icon}</span>
+                        {sticker.id === 'heart' && <span className="text-2xl">❤️</span>}
+                        {sticker.id === 'star' && <span className="text-2xl">⭐</span>}
+                        {sticker.id === 'smile' && <span className="text-2xl">😊</span>}
+                        {sticker.id === 'flower' && <span className="text-2xl">🌸</span>}
+                        {sticker.id === 'crown' && <span className="text-2xl">👑</span>}
+                        {sticker.id === 'ribbon' && <span className="text-2xl">🎀</span>}
+                        {sticker.id === 'cloud' && <span className="text-2xl">☁️</span>}
+                        {sticker.id === 'balloon' && <span className="text-2xl">🎈</span>}
                       </button>
                     ))}
                   </div>

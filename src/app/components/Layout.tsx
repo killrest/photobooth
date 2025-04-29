@@ -22,7 +22,7 @@ export default function Layout({ children }: LayoutProps) {
               height={40}
               className="rounded-md"
             />
-          <h1 className="text-2xl font-bold text-amber-700">Free PhotoBooth</h1>
+          <h1 className="text-2xl font-bold text-amber-700">Yoyobooth</h1>
           </Link>
           <nav>
             <ul className="flex space-x-6">

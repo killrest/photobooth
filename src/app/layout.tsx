@@ -4,20 +4,20 @@ import { PhotoProvider } from "./context/PhotoContext";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Free PhotoBooth | Free Online Photo Strip Creator",
+  title: "Yoyobooth | Free Online Photo Strip Creator",
   description: "Turn your home into a free photobooth with exclusive templates, trendy filters, and fun stickers—beautiful results every time",
   keywords: ["photobooth", "free photobooth", "online photobooth", "照相亭", "在线照相亭", "免费照相亭"],
-  authors: [{ name: "Free PhotoBooth Team" }],
+  authors: [{ name: "yoyobooth Team" }],
   icons: {
     icon: '/icon.jpg',
     shortcut: '/icon.jpg',
     apple: '/icon.jpg',
   },
   openGraph: {
-    title: "Free PhotoBooth | Free Online Photo Strip Creator",
+    title: "Yoyobooth | Free Online Photo Strip Creator",
     description: "Turn your home into a free photobooth with exclusive templates, trendy filters, and fun stickers—beautiful results every time",
-    url: "https://freephotobooth.app",
-    siteName: "Free PhotoBooth",
+    url: "https://yoyobooth.app",
+    siteName: "Yoyobooth",
     locale: "zh_CN",
     type: "website",
     images: [
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
         url: '/icon.jpg',
         width: 400,
         height: 400,
-        alt: 'Free PhotoBooth Logo',
+        alt: 'Yoyobooth Logo',
       }
     ],
   },
