@@ -1,38 +1,70 @@
-# KacaKacaBooth - The Free Photo Booth
+# Yoyobooth - Free Online Photo Booth
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Turn your home into a free photobooth with exclusive templates, trendy filters, and fun stickers—beautiful results every time.
+
+## Features
+
+- Take photos directly from your browser
+- Apply various templates and effects
+- Share your creations instantly
+- Support the project through donations
+
+## Live Demo
+
+Visit [https://freephotobooth.app](https://freephotobooth.app) to see the application in action.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js 18+ and npm
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository
+   ```bash
+   git clone https://github.com/yourusername/photobooth.git
+   cd photobooth
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies
+   ```bash
+   npm install
+   ```
 
-## Learn More
+3. Set up environment variables
+   Create a `.env.local` file and add the following:
+   ```
+   # Stripe API Keys
+   STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+   
+   # Domain for success/cancel URLs
+   NEXT_PUBLIC_DOMAIN_URL=http://localhost:3000
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+4. Run the development server
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Vercel Deployment
 
-## Deploy on Vercel
+1. Push your code to GitHub
+2. Connect your GitHub repository to Vercel
+3. Set the following environment variables in Vercel:
+   - `STRIPE_SECRET_KEY` (use production key for live site)
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (use production key for live site)
+   - `NEXT_PUBLIC_DOMAIN_URL` (your production domain)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Built With
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js - React framework
+- Tailwind CSS - Styling
+- Stripe - Payment processing
+
+## License
+
+This project is licensed under the MIT License.
