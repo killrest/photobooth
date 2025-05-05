@@ -17,9 +17,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Yoyobooth | Free Online Photo Strip Creator",
     description: "Turn your home into a free photobooth with exclusive templates, trendy filters, and fun stickers—beautiful results every time",
-    url: "https://yoyobooth.app",
+    url: "https://freephotobooth.app",
     siteName: "Yoyobooth",
-    locale: "zh_CN",
+    locale: "en_US",
     type: "website",
     images: [
       {
@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh">
+    <html lang="en">
       <body className="antialiased">
         {/* Google Analytics */}
         <Script

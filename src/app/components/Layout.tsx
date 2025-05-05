@@ -3,6 +3,7 @@
 import React, { ReactNode } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import DonateButton from './DonateButton';
 
 type LayoutProps = {
   children: ReactNode;
@@ -24,10 +25,11 @@ export default function Layout({ children }: LayoutProps) {
             />
           <h1 className="text-2xl font-bold text-amber-700">Yoyobooth</h1>
           </Link>
-          <nav>
-            <ul className="flex space-x-6">
+          <nav className="flex items-center">
+            <ul className="flex space-x-6 items-center">
               <li><Link href="/" className="text-gray-800 hover:text-amber-700 transition">Home</Link></li>
               <li><Link href="/photo" className="text-gray-800 hover:text-amber-700 transition">Start Photo Booth</Link></li>
+              <li><DonateButton /></li>
             </ul>
           </nav>
         </div>
