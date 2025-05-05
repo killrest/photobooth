@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { PhotoProvider } from "./context/PhotoContext";
 import Script from "next/script";
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: "Yoyobooth | Free Online Photo Strip Creator",
@@ -55,6 +56,7 @@ export default function RootLayout({
         <PhotoProvider>
           {children}
         </PhotoProvider>
+        <Analytics />
       </body>
     </html>
   );
