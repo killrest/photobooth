@@ -262,9 +262,6 @@ export default function Home() {
               <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">What is our Online Photo Booth?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
-                    <span className="text-lg font-bold rotate-45">+</span>
-                  </div>
                 </div>
                 <p className="mt-3 text-gray-600">
                   Our free at-home Photo Booth brings the classic multi-cut strip experience right to your screen. Simply snap four quick photos in seconds and watch them transform into a stylish photo strip with our exclusive templates.
@@ -274,9 +271,6 @@ export default function Home() {
               <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">How much does it cost?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
-                    <span className="text-lg font-bold rotate-45">+</span>
-                  </div>
                 </div>
                 <p className="mt-3 text-gray-600">
                   100% free—no hidden fees or subscriptions. Enjoy unlimited shots with our online Photo Booth, all from the comfort of home.
@@ -286,9 +280,6 @@ export default function Home() {
               <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">Do I need to create an account?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
-                    <span className="text-lg font-bold rotate-45">+</span>
-                  </div>
                 </div>
                 <p className="mt-3 text-gray-600">
                   No sign-up required! Just visit the webpage, allow camera access, and start capturing your moments instantly.
@@ -298,9 +289,6 @@ export default function Home() {
               <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">Can I customize my photo strips?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
-                    <span className="text-lg font-bold rotate-45">+</span>
-                  </div>
                 </div>
                 <p className="mt-3 text-gray-600">
                   Yes! After snapping, choose from a library of one-of-a-kind templates, apply high-quality style filters (grainy, vintage, pastel, cinematic, and more), and add playful stickers to make each strip uniquely yours.
@@ -310,9 +298,6 @@ export default function Home() {
               <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">Which devices are supported?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
-                    <span className="text-lg font-bold rotate-45">+</span>
-                  </div>
                 </div>
                 <p className="mt-3 text-gray-600">
                   Our Photo Booth works on any camera-equipped device—desktop, laptop, tablet, or smartphone. Enjoy seamless performance and beautiful results wherever you are.
@@ -322,9 +307,6 @@ export default function Home() {
               <div className="border-b border-cream-200 py-5">
                 <div className="flex justify-between items-center cursor-pointer">
                   <h3 className="text-xl font-semibold text-gray-800">Is the photo quality as good as offline booths?</h3>
-                  <div className="w-11 h-9 rounded-lg border-2 border-amber-600 flex items-center justify-center bg-amber-600 text-cream-400">
-                    <span className="text-lg font-bold rotate-45">+</span>
-                  </div>
                 </div>
                 <p className="mt-3 text-gray-600">
                   Absolutely—image quality depends on your device camera and internet stability. With today's webcams and smartphone cameras, you'll get crisp, vibrant strips that rival any photo kiosk.
