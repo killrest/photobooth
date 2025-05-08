@@ -19,6 +19,62 @@
    ];
    ```
 
+   **CSS滤镜属性补充介绍**：
+   
+   在CSS的`filter`属性中，以下是可用的滤镜函数及其效果：
+   
+   1. **blur(radius)**  
+      - 参数：`<length>`，通常用`px`（如`blur(5px)`）  
+      - 效果：对图像进行高斯模糊，值越大越模糊
+   
+   2. **brightness(amount)**  
+      - 参数：`<number>`（单位倍数，如`0.5`）或百分比（`50%`）  
+      - 效果：调整亮度；`0`变黑，`1`原始，`>1`更亮
+   
+   3. **contrast(amount)**  
+      - 参数：`<number>`或百分比（`contrast(150%)`）  
+      - 效果：调整对比度；`0`全灰度，`1`原始，`>1`对比度增强
+   
+   4. **grayscale(amount)**  
+      - 参数：`<number>`或百分比；`1`或`100%`完全灰度，`0`原始色彩  
+      - 效果：去饱和变灰
+   
+   5. **sepia(amount)**  
+      - 参数：`<number>`或百分比；`1`或`100%`完全棕褐（复古）效果  
+      - 效果：模拟古旧照片的暖棕色调
+   
+   6. **saturate(amount)**  
+      - 参数：`<number>`或百分比；`0`完全去饱和，`1`原始，`>1`饱和度增强  
+      - 效果：控制图像的色彩饱和度
+   
+   7. **hue-rotate(angle)**  
+      - 参数：角度值，如`90deg`、`180deg`  
+      - 效果：在色相环上旋转色调，产生戏剧性色彩偏移
+   
+   8. **invert(amount)**  
+      - 参数：`<number>`或百分比；`1`或`100%`完全反相，`0`原始  
+      - 效果：将颜色反转，产生底片/幽灵感
+   
+   9. **opacity(amount)**  
+      - 参数：`<number>`或百分比；`0`完全透明，`1`或`100%`完全不透明  
+      - 效果：调整图像的不透明度
+   
+   10. **drop-shadow(offset-x offset-y blur-radius color)**  
+       - 参数：  
+         - `offset-x`、`offset-y`（如`2px 2px`）  
+         - `blur-radius`（可选，如`4px`）  
+         - `color`（如`rgba(0,0,0,0.5)`）  
+       - 效果：给图像添加投影，类似`box-shadow`，但保留图像透明度
+   
+   11. **url(<SVG-filter-id>)**  
+       - 参数：指向自定义SVG过滤器（如`url(#myFilter)`）  
+       - 效果：使用更复杂或自定义的SVG滤镜
+   
+   多个滤镜函数可以组合使用，以空格分隔，按从左到右的顺序应用。例如：
+   ```css
+   filter: sepia(50%) contrast(120%) blur(2px) hue-rotate(-10deg);
+   ```
+
 2. **滤镜选择**：用户可以通过点击UI中的滤镜按钮来选择滤镜。所选滤镜存储在状态中：
    ```javascript
    const [selectedFilter, setSelectedFilterState] = useState('normal');

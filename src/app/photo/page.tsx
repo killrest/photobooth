@@ -17,6 +17,8 @@ const filterOptions = [
   { id: 'oldPhoto', name: 'Old Photo', style: 'sepia(50%) contrast(120%)' },
   { id: 'amber', name: 'Amber', style: 'sepia(80%) hue-rotate(-20deg)' },
   { id: 'nocturne', name: 'Night', style: 'brightness(0.8) contrast(120%) saturate(1.2) hue-rotate(180deg)' },
+  { id: 'test', name: 'Test', style: 'blur(1.5px) brightness(0.8)' },
+  { id: 'vintageFilm', name: 'Vintage Film', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(30%)' },
 ];
 
 // Capture state enum
