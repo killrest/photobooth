@@ -8,6 +8,7 @@ import { FaCamera, FaUpload, FaArrowLeft, FaRedo } from 'react-icons/fa';
 import { usePhotoContext } from '../context/PhotoContext';
 import Link from 'next/link';
 import Layout from '../components/Layout';
+import html2canvas from 'html2canvas';
 
 // Define filter options
 const filterOptions = [
@@ -17,7 +18,8 @@ const filterOptions = [
   { id: 'oldPhoto', name: 'Old Photo', style: 'sepia(50%) contrast(120%)' },
   { id: 'amber', name: 'Amber', style: 'sepia(80%) hue-rotate(-20deg)' },
   { id: 'nocturne', name: 'Night', style: 'brightness(0.8) contrast(120%) saturate(1.2) hue-rotate(180deg)' },
-  { id: 'test', name: 'Test', style: 'blur(1.5px) brightness(0.8)' },
+  { id: 'test', name: 'Test', style: '' },
+  { id: 'paperTexture', name: 'Paper Texture', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(30%)' },
   { id: 'vintageFilm', name: 'Vintage Film', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(30%)' },
 ];
 
@@ -42,6 +44,75 @@ const PhotoPage = () => {
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'capture' | 'upload'>('capture');
   const [cameraError, setCameraError] = useState(false);
+
+  // 纸纹理是否显示
+  const showPaperTexture = selectedFilter === 'paperTexture';
+
+  // Get current filter style
+  const getCurrentFilterStyle = () => {
+    const filter = filterOptions.find(f => f.id === selectedFilter);
+    return filter?.style || '';
+  };
+
+  // Apply paper texture to an image using canvas
+  const applyPaperTextureToImage = async (imageDataUrl: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      try {
+        // 创建图像元素加载原始图像
+        const img = document.createElement('img');
+        img.crossOrigin = "Anonymous";
+        img.onload = () => {
+          // 创建画布
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error("无法获取 canvas 上下文"));
+            return;
+          }
+          
+          // 设置画布大小
+          canvas.width = img.width;
+          canvas.height = img.height;
+          
+          // 绘制原始图像
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          // 应用滤镜效果
+          ctx.filter = getCurrentFilterStyle();
+          ctx.globalCompositeOperation = 'source-atop';
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          ctx.filter = 'none';
+          
+          // 添加纸质纹理
+          const textureImg = document.createElement('img');
+          textureImg.crossOrigin = "Anonymous";
+          textureImg.onload = () => {
+            // 使用 overlay 混合模式添加纹理
+            ctx.globalCompositeOperation = 'overlay';
+            ctx.globalAlpha = 0.5; // 设置透明度
+            ctx.drawImage(textureImg, 0, 0, canvas.width, canvas.height);
+            
+            // 返回最终图像
+            resolve(canvas.toDataURL('image/jpeg', 0.95));
+          };
+          textureImg.onerror = () => {
+            console.error("纹理图像加载失败");
+            // 如果纹理加载失败，返回原始图像
+            resolve(imageDataUrl);
+          };
+          textureImg.src = '/textures/paper_texture.jpg';
+        };
+        img.onerror = () => {
+          console.error("原始图像加载失败");
+          reject(new Error("原始图像加载失败"));
+        };
+        img.src = imageDataUrl;
+      } catch (error) {
+        console.error("应用纸质纹理时出错:", error);
+        reject(error);
+      }
+    });
+  };
 
   // Select filter
   const handleFilterSelect = (filterId: string) => {
@@ -71,38 +142,92 @@ const PhotoPage = () => {
           setCountdown(countdown - 1);
         }, 1000);
       } else {
-        // Take photo
-        const imageSrc = webcamRef.current?.getScreenshot();
-        if (imageSrc) {
-          const newPhotos = [...capturedPhotos];
-          newPhotos[currentPhotoIndex] = imageSrc;
-          setCapturedPhotos(newPhotos);
+        // 创建一个短暂的延迟，让GO!动画完成并消失
+        timerId = setTimeout(async () => {
+          // 获取相机视图的容器元素
+          const cameraViewRef = document.getElementById('camera-view-container');
           
-          // Find next empty photo slot (always capture in order from top to bottom)
-          let nextEmptyIndex = -1;
-          for (let i = 0; i < newPhotos.length; i++) {
-            if (newPhotos[i] === null) {
-              nextEmptyIndex = i;
-              break;
+          // 暂时隐藏倒计时覆盖层以便拍照
+          const countdownOverlay = document.getElementById('countdown-overlay');
+          if (countdownOverlay) {
+            countdownOverlay.style.display = 'none';
+          }
+          
+          // 直接使用 webcam 截图
+          const imageSrc = webcamRef.current?.getScreenshot();
+          if (imageSrc) {
+            try {
+              // 对于纸质纹理滤镜，应用特殊处理
+              let finalImageSrc = imageSrc;
+              if (showPaperTexture) {
+                finalImageSrc = await applyPaperTextureToImage(imageSrc);
+              }
+              
+              // 保存图像
+              const newPhotos = [...capturedPhotos];
+              newPhotos[currentPhotoIndex] = finalImageSrc;
+              setCapturedPhotos(newPhotos);
+              
+              // 处理完成后恢复倒计时覆盖层
+              if (countdownOverlay) {
+                countdownOverlay.style.display = '';
+              }
+              
+              // 查找下一个空槽位
+              let nextEmptyIndex = -1;
+              for (let i = 0; i < newPhotos.length; i++) {
+                if (newPhotos[i] === null) {
+                  nextEmptyIndex = i;
+                  break;
+                }
+              }
+              
+              if (nextEmptyIndex !== -1) {
+                // 如果还有空槽位，继续拍摄下一张
+                setCurrentPhotoIndex(nextEmptyIndex);
+                setCountdown(2); // 简短延迟，然后拍摄下一张
+              } else {
+                // 所有照片都已拍摄
+                setCaptureState(CaptureState.REVIEWING);
+              }
+            } catch (error) {
+              console.error("处理照片时出错:", error);
+              
+              // 出错时使用原始图像
+              const newPhotos = [...capturedPhotos];
+              newPhotos[currentPhotoIndex] = imageSrc;
+              setCapturedPhotos(newPhotos);
+              
+              // 处理完成后恢复倒计时覆盖层
+              if (countdownOverlay) {
+                countdownOverlay.style.display = '';
+              }
+              
+              // 继续处理下一张照片...
+              let nextEmptyIndex = -1;
+              for (let i = 0; i < newPhotos.length; i++) {
+                if (newPhotos[i] === null) {
+                  nextEmptyIndex = i;
+                  break;
+                }
+              }
+              
+              if (nextEmptyIndex !== -1) {
+                setCurrentPhotoIndex(nextEmptyIndex);
+                setCountdown(2);
+              } else {
+                setCaptureState(CaptureState.REVIEWING);
+              }
             }
           }
-          
-          if (nextEmptyIndex !== -1) {
-            // If there are empty slots, continue with the next photo
-            setCurrentPhotoIndex(nextEmptyIndex);
-            setCountdown(2); // Brief delay before capturing the next photo
-          } else {
-            // All photos captured
-            setCaptureState(CaptureState.REVIEWING);
-          }
-        }
+        }, 200); // 短暂延迟让GO!动画完成
       }
     }
     
     return () => {
       if (timerId) clearTimeout(timerId);
     };
-  }, [captureState, countdown, currentPhotoIndex, capturedPhotos]);
+  }, [captureState, countdown, currentPhotoIndex, capturedPhotos, showPaperTexture]);
 
   // Handle photo upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,17 +282,20 @@ const PhotoPage = () => {
     setCameraError(true);
   };
 
-  // Get current filter style
-  const getCurrentFilterStyle = () => {
-    const filter = filterOptions.find(f => f.id === selectedFilter);
-    return filter?.style || '';
-  };
-
   // Calculate number of captured photos
   const capturedCount = capturedPhotos.filter(photo => photo !== null).length;
 
   return (
     <Layout>
+      {/* SVG Filter Definitions */}
+      <svg style={{ width: 0, height: 0, position: 'absolute' }}>
+        <defs>
+          <filter id="paperTextureFilter">
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" />
+          </filter>
+        </defs>
+      </svg>
+
       {/* Main container with reduced padding */}
       <div className="container mx-auto px-3 pt-0 pb-2">
         {/* Back Button with reduced spacing */}
@@ -223,8 +351,11 @@ const PhotoPage = () => {
                   {/* Main camera column */}
                   <div className="flex-1">
                     {/* Camera view */}
-                    <div className="relative overflow-hidden rounded-xl shadow-md border border-gray-200 bg-transparent mx-auto" 
-                      style={{ width: '100%', maxWidth: '600px', height: '400px' }}>
+                    <div 
+                      id="camera-view-container"
+                      className="relative overflow-hidden rounded-xl shadow-md border border-gray-200 bg-transparent mx-auto" 
+                      style={{ width: '100%', maxWidth: '600px', height: '400px' }}
+                    >
                       <Webcam
                         audio={false}
                         ref={webcamRef}
@@ -238,9 +369,26 @@ const PhotoPage = () => {
                         style={{ filter: getCurrentFilterStyle(), transform: 'scaleX(-1)' }}
                       />
                       
+                      {/* 纸纹理覆盖层 */}
+                      {showPaperTexture && (
+                        <div 
+                          id="paper-texture-overlay"
+                          className="absolute inset-0" 
+                          style={{
+                            backgroundImage: "url('/textures/paper_texture.jpg')",
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            width: "100%",
+                            height: "100%",
+                            opacity: 0.5,
+                            mixBlendMode: "overlay"
+                          }}
+                        />
+                      )}
+                      
                       {/* Countdown overlay */}
                       {captureState === CaptureState.CAPTURING && countdown !== null && countdown >= 0 && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-transparent bg-opacity-20">
+                        <div id="countdown-overlay" className="absolute inset-0 flex items-center justify-center bg-transparent bg-opacity-20">
                           <div className="text-7xl font-bold text-white drop-shadow-lg animate-pulse" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
                             {countdown > 0 ? countdown : 'GO!'}
                           </div>
@@ -329,7 +477,7 @@ const PhotoPage = () => {
                               src={capturedPhotos[i] as string} 
                               alt={`Photo ${i+1}`} 
                               className="w-full h-full object-cover" 
-                              style={{ filter: getCurrentFilterStyle(), transform: 'scaleX(-1)' }}
+                              style={{ transform: 'scaleX(-1)' }}
                               width={120}
                               height={80}
                               unoptimized

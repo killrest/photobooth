@@ -13,13 +13,28 @@ interface TemplateRendererProps {
   onStickerMouseDown?: (e: React.MouseEvent, index: number) => void;
   onStickerDelete?: (index: number) => void;
   filterStyle?: string;
+  showPaperTexture?: boolean;
 }
 
 const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
-  ({ template, photos, selectedStickers, stickersMap, borderStyle, onStickerMouseDown, onStickerDelete, filterStyle = '' }, ref) => {
+  ({ template, photos, selectedStickers, stickersMap, borderStyle, onStickerMouseDown, onStickerDelete, filterStyle = '', showPaperTexture = false }, ref) => {
     // For measuring drag events relative to container
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     
+    // This function determines if an image URL was captured using html2canvas
+    // html2canvas images start with data:image/jpeg and have characteristic attributes
+    const isHtml2CanvasImage = (imageUrl: string): boolean => {
+      // First check if it's a data URL
+      if (!Boolean(imageUrl && imageUrl.startsWith('data:image/'))) {
+        return false;
+      }
+
+      // For paperTexture filter, we're now manually applying the filter and texture
+      // Since it's processed by our custom applyPaperTextureToImage function,
+      // all these images should be considered as already processed
+      return true;
+    };
+
     // Format current date as YYYY-MM-DD
     const formatDate = () => {
       const now = new Date();
@@ -91,7 +106,7 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
                     objectFit: 'cover',
                     border: 'none', // 移除照片白色边框
                     transform: 'scaleX(-1)', // 镜像翻转修复
-                    filter: filterStyle, // Apply the filter style
+                    filter: !isHtml2CanvasImage(photo) ? filterStyle : '', // Only apply filter if not already processed
                     ...(template.photoBorderWidth && template.photoBorderColor ? {
                       border: `${template.photoBorderWidth}px solid ${template.photoBorderColor}`
                     } : {})
@@ -100,6 +115,23 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
                   height={500}
                   unoptimized
                 />
+                
+                {/* 相纸纹理覆盖层 */}
+                {showPaperTexture && photo && !isHtml2CanvasImage(photo) && (
+                  <div 
+                    className="absolute inset-0" 
+                    style={{
+                      backgroundImage: "url('/textures/paper_texture.jpg')",
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      width: "100%",
+                      height: "100%",
+                      opacity: 0.5,
+                      mixBlendMode: "overlay",
+                      pointerEvents: "none"
+                    }}
+                  />
+                )}
               </div>
             ))}
           </div>
@@ -261,7 +293,7 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
                     style={{
                       objectFit: 'cover',
                       transform: 'scaleX(-1)', // 镜像翻转修复
-                      filter: filterStyle, // Apply the filter style
+                      filter: !isHtml2CanvasImage(photos[index]) ? filterStyle : '', // Only apply filter if not already processed
                       ...(template.photoBorderWidth && template.photoBorderColor ? {
                         border: `${template.photoBorderWidth}px solid ${template.photoBorderColor}`
                       } : {})
@@ -270,6 +302,23 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
                     height={500}
                     unoptimized
                   />
+                  
+                  {/* 相纸纹理覆盖层 */}
+                  {showPaperTexture && photos[index] && !isHtml2CanvasImage(photos[index]) && (
+                    <div 
+                      className="absolute inset-0" 
+                      style={{
+                        backgroundImage: "url('/textures/paper_texture.jpg')",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        width: "100%",
+                        height: "100%",
+                        opacity: 0.5,
+                        mixBlendMode: "overlay",
+                        pointerEvents: "none"
+                      }}
+                    />
+                  )}
                 </div>
               </div>
             );

@@ -10,6 +10,7 @@ import Layout from '../components/Layout';
 import TemplateRenderer from '../components/TemplateRenderer';
 import TemplateSelector from '../components/TemplateSelector';
 import templates from '../constants/templates';
+import Image from 'next/image';
 
 // Frame color options
 const frameColors = [
@@ -39,6 +40,9 @@ const filterOptions = [
   { id: 'oldPhoto', name: 'Old Photo', style: 'sepia(50%) contrast(120%)' },
   { id: 'amber', name: 'Amber', style: 'sepia(80%) hue-rotate(-20deg)' },
   { id: 'nocturne', name: 'Night', style: 'brightness(0.8) contrast(120%) saturate(1.2) hue-rotate(180deg)' },
+  { id: 'test', name: 'Test', style: 'brightness(0.8) url(#paperTextureFilter)' },
+  { id: 'paperTexture', name: 'Paper Texture', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(30%)' },
+  { id: 'vintageFilm', name: 'Vintage Film', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(30%)' },
 ];
 
 // 贴纸选项
@@ -172,6 +176,9 @@ const ResultPage = () => {
     const filter = filterOptions.find(f => f.id === photoData.selectedFilter);
     return filter?.style || '';
   };
+
+  // 纸纹理是否显示
+  const showPaperTexture = photoData.selectedFilter === 'paperTexture';
 
   // Get the border color for the frame
   const getBorderColor = () => {
@@ -488,6 +495,18 @@ const ResultPage = () => {
 
   return (
     <Layout>
+      {/* SVG Filter Definitions */}
+      <svg style={{ width: 0, height: 0, position: 'absolute' }}>
+        <defs>
+          <filter id="paperTextureFilter">
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" />
+          </filter>
+          <filter id="paperTextureFilter2">
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" />
+          </filter>
+        </defs>
+      </svg>
+      
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center mb-4">
           <Link href="/" className="flex items-center text-gray-700 hover:text-amber-700 transition text-sm">
@@ -512,6 +531,7 @@ const ResultPage = () => {
                 onStickerMouseDown={handleTemplateMouseDown}
                 onStickerDelete={handleDeleteSticker}
                 filterStyle={getFilterStyle()}
+                showPaperTexture={showPaperTexture}
               />
             </div>
             
