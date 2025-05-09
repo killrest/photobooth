@@ -23,3 +23,16 @@ html, body {
   background-color: #FFFEF8 !important;
   color: #A87839 !important;
 }
+
+/* Safari-specific filter fixes */
+@media not all and (min-resolution:.001dpcm) { 
+  @supports (-webkit-appearance:none) {
+    .safari-filter-fix {
+      -webkit-transform: translateZ(0) scaleX(-1) !important;
+      -webkit-backface-visibility: hidden;
+      transform: translateZ(0) scaleX(-1) !important;
+      backface-visibility: hidden;
+      will-change: filter;
+    }
+  }
+}

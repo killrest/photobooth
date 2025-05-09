@@ -11,7 +11,7 @@ interface FilterOption {
 
 const filterOptions: FilterOption[] = [
   { id: 'normal', name: 'Default', style: '', texture: null },
-  { id: 'paperTexture', name: 'American retro', style: 'sepia(80%) contrast(110%) brightness(125%) grayscale(25%)', texture: { path: '/textures/paper_texture.jpg', opacity: 0.7 } },
+  { id: 'paperTexture', name: 'American retro', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(25%)', texture: { path: '/textures/paper_texture.jpg', opacity: 0.7 } },
   { id: 'bw', name: 'B&W', style: 'grayscale(100%)', texture: null },
   { id: 'vintage', name: 'Vintage', style: 'sepia(80%)', texture: null },
   { id: 'oldPhoto', name: 'Old Photo', style: 'sepia(50%) contrast(120%)', texture: null },

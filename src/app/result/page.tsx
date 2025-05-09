@@ -13,6 +13,12 @@ import templates from '../constants/templates';
 import filterOptions from '../constants/filters';
 import Image from 'next/image';
 
+// Helper function to detect Safari browser
+const isSafari = () => {
+  if (typeof window === 'undefined') return false;
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+};
+
 // Frame color options
 const frameColors = [
   { id: 'rainbow', color: 'linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet)', name: 'Rainbow' },
@@ -115,6 +121,16 @@ const SectionTitle = ({ title }: { title: string }) => (
   </h3>
 );
 
+// Get compatible filter style with prefixes for Safari compatibility
+const getCompatibleFilterStyle = (originalStyle: string): React.CSSProperties => {
+  if (!originalStyle) return {};
+  
+  return {
+    WebkitFilter: originalStyle,
+    filter: originalStyle,
+  };
+};
+
 const ResultPage = () => {
   const router = useRouter();
   const { photoData } = usePhotoContext();
@@ -176,6 +192,12 @@ const ResultPage = () => {
   const getFilterStyle = () => {
     const filter = filterOptions.find(f => f.id === photoData.selectedFilter);
     return filter?.style || '';
+  };
+
+  // Get compatible filter style object
+  const getFilterStyleObject = () => {
+    const filterStyle = getFilterStyle();
+    return getCompatibleFilterStyle(filterStyle);
   };
 
   // 获取当前滤镜的纹理路径
@@ -530,7 +552,7 @@ const ResultPage = () => {
                 photos={photoData?.photos || []}
                 selectedStickers={selectedStickers}
                 stickersMap={stickersMap}
-                borderStyle={getBorderColor() as React.CSSProperties}
+                borderStyle={selectedTemplateId === 'default' ? getBorderColor() : undefined}
                 onStickerMouseDown={handleTemplateMouseDown}
                 onStickerDelete={handleDeleteSticker}
                 filterStyle={getFilterStyle()}

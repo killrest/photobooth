@@ -1,8 +1,14 @@
 'use client';
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef } from 'react';
 import Image from 'next/image';
 import { Template } from '../constants/templates';
+
+// Helper function to detect Safari browser
+const isSafari = () => {
+  if (typeof window === 'undefined') return false;
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+};
 
 interface TemplateRendererProps {
   template: Template;
@@ -23,18 +29,34 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
     // For measuring drag events relative to container
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     
+    // Detect Safari browser
+    const safari = typeof window !== 'undefined' ? isSafari() : false;
+    
     // This function determines if an image URL was captured using html2canvas
-    // html2canvas images start with data:image/jpeg and have characteristic attributes
     const isHtml2CanvasImage = (imageUrl: string): boolean => {
       // First check if it's a data URL
       if (!Boolean(imageUrl && imageUrl.startsWith('data:image/'))) {
         return false;
       }
 
-      // For paperTexture filter, we're now manually applying the filter and texture
-      // Since it's processed by our custom applyPaperTextureToImage function,
-      // all these images should be considered as already processed
+      // In Safari, we'll treat data URLs as not pre-processed so we can apply filters
+      if (safari) {
+        return false;
+      }
+
+      // For other browsers, we'll assume data URLs have filters already applied
       return true;
+    };
+
+    // Get filter style with prefixes for Safari compatibility
+    const getCompatibleFilterStyle = (originalStyle: string): React.CSSProperties => {
+      if (!originalStyle) return {};
+      
+      // 只返回滤镜相关属性，不修改变换属性，避免覆盖镜像翻转
+      return {
+        WebkitFilter: originalStyle,
+        filter: originalStyle,
+      };
     };
 
     // Format current date as YYYY-MM-DD
@@ -102,13 +124,13 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
                 <Image 
                   src={photo} 
                   alt={`Photo ${index+1}`} 
-                  className="w-full rounded-sm"
+                  className={`w-full rounded-sm ${safari ? 'safari-filter-fix' : ''}`}
                   style={{ 
                     aspectRatio: '3/2', 
                     objectFit: 'cover',
                     border: 'none', // 移除照片白色边框
-                    transform: 'scaleX(-1)', // 镜像翻转修复
-                    filter: !isHtml2CanvasImage(photo) ? filterStyle : '', // Only apply filter if not already processed
+                    transform: 'scaleX(-1)', // 始终保留镜像翻转
+                    ...((!isHtml2CanvasImage(photo) && filterStyle) ? getCompatibleFilterStyle(filterStyle) : {}),
                     ...(template.photoBorderWidth && template.photoBorderColor ? {
                       border: `${template.photoBorderWidth}px solid ${template.photoBorderColor}`
                     } : {})
@@ -139,7 +161,7 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
           </div>
           
           {/* 底部品牌和时间标记 */}
-          <div className={`text-center mt-2 text-xs ${textColorClass}`}>
+          <div className="text-center mt-2 text-xs text-gray-500">
             <p className="font-medium">Yoyobooth</p>
             <p className="text-[10px]">{formatDate()} • {formatTime()}</p>
           </div>
@@ -291,11 +313,11 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
                   <Image 
                     src={photos[index]} 
                     alt={`Photo ${index+1}`}
-                    className="w-full h-full"
+                    className={`w-full h-full ${safari ? 'safari-filter-fix' : ''}`}
                     style={{
                       objectFit: 'cover',
-                      transform: 'scaleX(-1)', // 镜像翻转修复
-                      filter: !isHtml2CanvasImage(photos[index]) ? filterStyle : '', // Only apply filter if not already processed
+                      transform: 'scaleX(-1)', // 始终保留镜像翻转
+                      ...((!isHtml2CanvasImage(photos[index]) && filterStyle) ? getCompatibleFilterStyle(filterStyle) : {}),
                       ...(template.photoBorderWidth && template.photoBorderColor ? {
                         border: `${template.photoBorderWidth}px solid ${template.photoBorderColor}`
                       } : {})
@@ -327,38 +349,14 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
           })}
         </div>
         
-        {/* 模板层 - 中间层，位于照片之上但贴纸之下 */}
-        <div className="absolute inset-0" style={{ zIndex: 5 }}>
-          {/* 默认模板使用一个简单的装饰性边框作为模板 */}
-          {template.templateImagePath ? (
-            <Image 
-              src={template.templateImagePath}
-              alt={`${template.name} template overlay`}
-              className="absolute inset-0"
-              style={{
-                objectFit: 'cover',
-                width: '100%',
-                height: '100%',
-                pointerEvents: 'none'
-              }}
-              width={500}
-              height={500}
-              priority
-              unoptimized
-            />
-          ) : (
-            <>
-              <div className="absolute inset-0" style={{ 
-                boxShadow: 'inset 0 0 0 1px rgba(255, 255, 255, 0.3)',
-                borderRadius: '6px' // 增加边框圆角
-              }}></div>
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white opacity-10"></div>
-            </>
-          )}
+        {/* 底部品牌和时间标记 */}
+        <div className="text-center mt-2 text-xs text-gray-500">
+          <p className="font-medium">Yoyobooth</p>
+          <p className="text-[10px]">{formatDate()} • {formatTime()}</p>
         </div>
         
         {/* 贴纸层 - 顶层 */}
-        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+        <div className="absolute inset-0 pointer-events-none">
           {selectedStickers.map((sticker, index) => {
             // Calculate actual sticker position
             const style = {
@@ -413,17 +411,9 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
             );
           })}
         </div>
-        
-        {/* 底部品牌和时间标记 */}
-        <div className="absolute bottom-1 right-2 text-right">
-          <p className="text-[8px] font-medium text-white opacity-80 drop-shadow-md">Free PhotoBooth</p>
-          <p className="text-[7px] text-white opacity-80 drop-shadow-md">{formatDate()}</p>
-        </div>
       </div>
     );
   }
 );
-
-TemplateRenderer.displayName = 'TemplateRenderer';
 
 export default TemplateRenderer;
