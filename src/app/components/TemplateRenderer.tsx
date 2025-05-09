@@ -13,11 +13,13 @@ interface TemplateRendererProps {
   onStickerMouseDown?: (e: React.MouseEvent, index: number) => void;
   onStickerDelete?: (index: number) => void;
   filterStyle?: string;
-  showPaperTexture?: boolean;
+  hasTexture?: boolean;
+  textureUrl?: string | null;
+  textureOpacity?: number;
 }
 
 const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
-  ({ template, photos, selectedStickers, stickersMap, borderStyle, onStickerMouseDown, onStickerDelete, filterStyle = '', showPaperTexture = false }, ref) => {
+  ({ template, photos, selectedStickers, stickersMap, borderStyle, onStickerMouseDown, onStickerDelete, filterStyle = '', hasTexture = false, textureUrl = null, textureOpacity = 0.5 }, ref) => {
     // For measuring drag events relative to container
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     
@@ -117,16 +119,16 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
                 />
                 
                 {/* 相纸纹理覆盖层 */}
-                {showPaperTexture && photo && !isHtml2CanvasImage(photo) && (
+                {hasTexture && photo && !isHtml2CanvasImage(photo) && (
                   <div 
                     className="absolute inset-0" 
                     style={{
-                      backgroundImage: "url('/textures/paper_texture.jpg')",
+                      backgroundImage: `url(${textureUrl})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       width: "100%",
                       height: "100%",
-                      opacity: 0.5,
+                      opacity: textureOpacity,
                       mixBlendMode: "overlay",
                       pointerEvents: "none"
                     }}
@@ -304,16 +306,16 @@ const TemplateRenderer = forwardRef<HTMLDivElement, TemplateRendererProps>(
                   />
                   
                   {/* 相纸纹理覆盖层 */}
-                  {showPaperTexture && photos[index] && !isHtml2CanvasImage(photos[index]) && (
+                  {hasTexture && photos[index] && !isHtml2CanvasImage(photos[index]) && (
                     <div 
                       className="absolute inset-0" 
                       style={{
-                        backgroundImage: "url('/textures/paper_texture.jpg')",
+                        backgroundImage: `url(${textureUrl})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                         width: "100%",
                         height: "100%",
-                        opacity: 0.5,
+                        opacity: textureOpacity,
                         mixBlendMode: "overlay",
                         pointerEvents: "none"
                       }}

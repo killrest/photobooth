@@ -9,19 +9,20 @@ import { usePhotoContext } from '../context/PhotoContext';
 import Link from 'next/link';
 import Layout from '../components/Layout';
 import html2canvas from 'html2canvas';
+import filterOptions from '../constants/filters';
 
 // Define filter options
-const filterOptions = [
-  { id: 'normal', name: 'Default', style: '' },
-  { id: 'bw', name: 'B&W', style: 'grayscale(100%)' },
-  { id: 'vintage', name: 'Vintage', style: 'sepia(80%)' },
-  { id: 'oldPhoto', name: 'Old Photo', style: 'sepia(50%) contrast(120%)' },
-  { id: 'amber', name: 'Amber', style: 'sepia(80%) hue-rotate(-20deg)' },
-  { id: 'nocturne', name: 'Night', style: 'brightness(0.8) contrast(120%) saturate(1.2) hue-rotate(180deg)' },
-  { id: 'test', name: 'Test', style: '' },
-  { id: 'paperTexture', name: 'Paper Texture', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(30%)' },
-  { id: 'vintageFilm', name: 'Vintage Film', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(30%)' },
-];
+// const filterOptions = [
+//   { id: 'normal', name: 'Default', style: '' },
+//   { id: 'bw', name: 'B&W', style: 'grayscale(100%)' },
+//   { id: 'vintage', name: 'Vintage', style: 'sepia(80%)' },
+//   { id: 'oldPhoto', name: 'Old Photo', style: 'sepia(50%) contrast(120%)' },
+//   { id: 'amber', name: 'Amber', style: 'sepia(80%) hue-rotate(-20deg)' },
+//   { id: 'nocturne', name: 'Night', style: 'brightness(0.8) contrast(120%) saturate(1.2) hue-rotate(180deg)' },
+//   { id: 'test', name: 'Test', style: '' },
+//   { id: 'paperTexture', name: 'Paper Texture', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(30%)' },
+//   { id: 'vintageFilm', name: 'Vintage Film', style: 'sepia(80%) contrast(110%) brightness(115%) grayscale(30%)' },
+// ];
 
 // Capture state enum
 const CaptureState = {
@@ -45,8 +46,22 @@ const PhotoPage = () => {
   const [activeTab, setActiveTab] = useState<'capture' | 'upload'>('capture');
   const [cameraError, setCameraError] = useState(false);
 
-  // 纸纹理是否显示
-  const showPaperTexture = selectedFilter === 'paperTexture';
+  // 获取当前滤镜的纹理路径
+  const getCurrentTextureUrl = () => {
+    const filter = filterOptions.find(f => f.id === selectedFilter);
+    return filter?.texture?.path || null;
+  };
+
+  // 获取当前滤镜的纹理透明度
+  const getCurrentTextureOpacity = () => {
+    const filter = filterOptions.find(f => f.id === selectedFilter);
+    return filter?.texture?.opacity || 0.5; // 默认透明度为0.5
+  };
+
+  // 检查当前滤镜是否有纹理
+  const hasTexture = () => {
+    return !!getCurrentTextureUrl();
+  };
 
   // Get current filter style
   const getCurrentFilterStyle = () => {
@@ -54,8 +69,8 @@ const PhotoPage = () => {
     return filter?.style || '';
   };
 
-  // Apply paper texture to an image using canvas
-  const applyPaperTextureToImage = async (imageDataUrl: string): Promise<string> => {
+  // 将纸质纹理函数改为通用的纹理应用函数
+  const applyTextureToImage = async (imageDataUrl: string, texturePath: string): Promise<string> => {
     return new Promise((resolve, reject) => {
       try {
         // 创建图像元素加载原始图像
@@ -83,13 +98,13 @@ const PhotoPage = () => {
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           ctx.filter = 'none';
           
-          // 添加纸质纹理
+          // 添加纹理
           const textureImg = document.createElement('img');
           textureImg.crossOrigin = "Anonymous";
           textureImg.onload = () => {
             // 使用 overlay 混合模式添加纹理
             ctx.globalCompositeOperation = 'overlay';
-            ctx.globalAlpha = 0.5; // 设置透明度
+            ctx.globalAlpha = getCurrentTextureOpacity();
             ctx.drawImage(textureImg, 0, 0, canvas.width, canvas.height);
             
             // 返回最终图像
@@ -100,7 +115,7 @@ const PhotoPage = () => {
             // 如果纹理加载失败，返回原始图像
             resolve(imageDataUrl);
           };
-          textureImg.src = '/textures/paper_texture.jpg';
+          textureImg.src = texturePath;
         };
         img.onerror = () => {
           console.error("原始图像加载失败");
@@ -108,7 +123,7 @@ const PhotoPage = () => {
         };
         img.src = imageDataUrl;
       } catch (error) {
-        console.error("应用纸质纹理时出错:", error);
+        console.error("应用纹理时出错:", error);
         reject(error);
       }
     });
@@ -157,10 +172,11 @@ const PhotoPage = () => {
           const imageSrc = webcamRef.current?.getScreenshot();
           if (imageSrc) {
             try {
-              // 对于纸质纹理滤镜，应用特殊处理
+              // 对于有纹理的滤镜，应用特殊处理
               let finalImageSrc = imageSrc;
-              if (showPaperTexture) {
-                finalImageSrc = await applyPaperTextureToImage(imageSrc);
+              const textureUrl = getCurrentTextureUrl();
+              if (textureUrl) {
+                finalImageSrc = await applyTextureToImage(imageSrc, textureUrl);
               }
               
               // 保存图像
@@ -227,7 +243,7 @@ const PhotoPage = () => {
     return () => {
       if (timerId) clearTimeout(timerId);
     };
-  }, [captureState, countdown, currentPhotoIndex, capturedPhotos, showPaperTexture]);
+  }, [captureState, countdown, currentPhotoIndex, capturedPhotos]);
 
   // Handle photo upload
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -287,15 +303,6 @@ const PhotoPage = () => {
 
   return (
     <Layout>
-      {/* SVG Filter Definitions */}
-      <svg style={{ width: 0, height: 0, position: 'absolute' }}>
-        <defs>
-          <filter id="paperTextureFilter">
-            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" />
-          </filter>
-        </defs>
-      </svg>
-
       {/* Main container with reduced padding */}
       <div className="container mx-auto px-3 pt-0 pb-2">
         {/* Back Button with reduced spacing */}
@@ -369,18 +376,18 @@ const PhotoPage = () => {
                         style={{ filter: getCurrentFilterStyle(), transform: 'scaleX(-1)' }}
                       />
                       
-                      {/* 纸纹理覆盖层 */}
-                      {showPaperTexture && (
+                      {/* 纹理覆盖层 */}
+                      {hasTexture() && (
                         <div 
-                          id="paper-texture-overlay"
+                          id="texture-overlay"
                           className="absolute inset-0" 
                           style={{
-                            backgroundImage: "url('/textures/paper_texture.jpg')",
+                            backgroundImage: `url('${getCurrentTextureUrl()}')`,
                             backgroundSize: "cover",
                             backgroundPosition: "center",
                             width: "100%",
                             height: "100%",
-                            opacity: 0.5,
+                            opacity: getCurrentTextureOpacity(),
                             mixBlendMode: "overlay"
                           }}
                         />
